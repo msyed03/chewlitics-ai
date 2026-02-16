@@ -1,5 +1,6 @@
-**Project Structure**
-chewliticsai/
+### Project Structure
+```
+chewlitics-ai/
 │
 ├── backend/
 │   ├── main.py
@@ -11,3 +12,5 @@ chewliticsai/
 ├── frontend/
 │
 └── README.md
+```
+
