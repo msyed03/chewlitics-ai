@@ -1,23 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import { theme } from '../../constants/theme';
 
 const Layout = ({ children }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsDesktop(window.innerWidth >= 1024);
+            if (window.innerWidth >= 1024) {
+                setSidebarOpen(false);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const mainStyle = {
-        marginLeft: '260px',
+        marginLeft: isDesktop ? '260px' : 0,
         marginTop: '72px',
         backgroundColor: theme.colors.background,
         minHeight: 'calc(100vh - 72px)',
-        '@media (max-width: 1024px)': {
-            marginLeft: 0,
-        },
+        transition: 'margin-left 300ms ease',
     };
 
     const overlayStyle = {
-        display: sidebarOpen ? 'block' : 'none',
+        display: sidebarOpen && !isDesktop ? 'block' : 'none',
         position: 'fixed',
         top: 0,
         left: 0,
@@ -25,15 +36,15 @@ const Layout = ({ children }) => {
         bottom: 0,
         backgroundColor: 'rgba(0,0,0,0.5)',
         zIndex: 999,
-        '@media (min-width: 1024px)': {
-            display: 'none',
-        },
+        opacity: sidebarOpen ? 1 : 0,
+        transition: 'opacity 300ms ease',
+        pointerEvents: sidebarOpen ? 'auto' : 'none',
     };
 
     return (
         <>
             <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
-            <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+            <Sidebar isOpen={isDesktop ? true : sidebarOpen} onClose={() => setSidebarOpen(false)} />
             <div style={overlayStyle} onClick={() => setSidebarOpen(false)} />
             <main style={mainStyle}>
                 {children}
