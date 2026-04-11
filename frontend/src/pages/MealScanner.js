@@ -30,7 +30,7 @@ const MealScanner = () => {
   return (
     <PageContainer>
       <SectionHeader
-        title="Meal Scanner"
+        title="Scan Meal"
         subtitle="Use AI to scan, analyze, and log your meals instantly."
       />
 
@@ -60,10 +60,8 @@ const MealScanner = () => {
             <p style={{
               ...theme.typography.body,
               color: theme.colors.textSecondary,
-              marginBottom: theme.spacing.lg,
               maxWidth: '500px',
-              margin: '0 auto',
-              marginBottom: theme.spacing.lg,
+              margin: `0 auto ${theme.spacing.lg}`,
             }}>
               Take a photo of your meal and our AI will instantly identify ingredients, estimate calories, and break down macronutrients.
             </p>

@@ -200,8 +200,8 @@ const GroceryPlanner = () => {
                     <AppButton style={{ height: 'auto', padding: theme.spacing.lg }}>
                         <div style={{ textAlign: 'center' }}>
                             <div style={{ fontSize: '32px', marginBottom: theme.spacing.sm }}>🤖</div>
-                            <div style={{ fontWeight: 600 }}>AI Shopping Assistant</div>
-                            <div style={{ fontSize: '13px', opacity: 0.8, marginTop: theme.spacing.xs }}>Get personalized recommendations</div>
+                            <div style={{ fontWeight: 600 }}>Smart Shopping Tips</div>
+                            <div style={{ fontSize: '13px', opacity: 0.8, marginTop: theme.spacing.xs }}>See efficient swaps and pantry reminders</div>
                         </div>
                     </AppButton>
                     <AppButton variant="secondary" style={{ height: 'auto', padding: theme.spacing.lg }}>

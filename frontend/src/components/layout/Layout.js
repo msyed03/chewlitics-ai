@@ -1,16 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import Sidebar from './Sidebar';
+import React, { useEffect, useState } from 'react';
+import { Outlet } from 'react-router-dom';
 import Header from './Header';
+import Sidebar from './Sidebar';
 import { theme } from '../../constants/theme';
 
-const Layout = ({ children }) => {
+const DESKTOP_BREAKPOINT = 1024;
+
+const Layout = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+    const [isDesktop, setIsDesktop] = useState(window.innerWidth >= DESKTOP_BREAKPOINT);
 
     useEffect(() => {
         const handleResize = () => {
-            setIsDesktop(window.innerWidth >= 1024);
-            if (window.innerWidth >= 1024) {
+            const desktop = window.innerWidth >= DESKTOP_BREAKPOINT;
+            setIsDesktop(desktop);
+            if (desktop) {
                 setSidebarOpen(false);
             }
         };
@@ -20,34 +24,38 @@ const Layout = ({ children }) => {
     }, []);
 
     const mainStyle = {
-        marginLeft: isDesktop ? '260px' : 0,
-        marginTop: '72px',
+        marginLeft: isDesktop ? theme.shell.sidebarWidth : 0,
+        marginTop: theme.shell.headerHeight,
         backgroundColor: theme.colors.background,
-        minHeight: 'calc(100vh - 72px)',
-        transition: 'margin-left 300ms ease',
+        minHeight: `calc(100vh - ${theme.shell.headerHeight})`,
+        transition: 'margin-left 220ms ease',
     };
 
     const overlayStyle = {
         display: sidebarOpen && !isDesktop ? 'block' : 'none',
         position: 'fixed',
-        top: 0,
+        top: theme.shell.headerHeight,
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: 'rgba(17, 24, 39, 0.24)',
         zIndex: 999,
-        opacity: sidebarOpen ? 1 : 0,
-        transition: 'opacity 300ms ease',
-        pointerEvents: sidebarOpen ? 'auto' : 'none',
     };
 
     return (
         <>
-            <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
-            <Sidebar isOpen={isDesktop ? true : sidebarOpen} onClose={() => setSidebarOpen(false)} />
+            <Header
+                onMenuClick={() => setSidebarOpen((open) => !open)}
+                isDesktop={isDesktop}
+            />
+            <Sidebar
+                isOpen={isDesktop ? true : sidebarOpen}
+                onClose={() => setSidebarOpen(false)}
+                isDesktop={isDesktop}
+            />
             <div style={overlayStyle} onClick={() => setSidebarOpen(false)} />
             <main style={mainStyle}>
-                {children}
+                <Outlet />
             </main>
         </>
     );

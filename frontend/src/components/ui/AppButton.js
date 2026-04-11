@@ -1,59 +1,62 @@
 import React from 'react';
 import { theme } from '../../constants/theme';
 
+const variantStyles = {
+    primary: {
+        backgroundColor: theme.colors.primary,
+        color: '#FFFFFF',
+        border: '1px solid transparent',
+        boxShadow: theme.shadows.button,
+    },
+    secondary: {
+        backgroundColor: theme.colors.surface,
+        color: theme.colors.textPrimary,
+        border: `1px solid ${theme.colors.border}`,
+        boxShadow: 'none',
+    },
+    ghost: {
+        backgroundColor: 'transparent',
+        color: theme.colors.textPrimary,
+        border: `1px solid transparent`,
+        boxShadow: 'none',
+    },
+};
+
 const AppButton = ({
     children,
     variant = 'primary',
     onClick,
     disabled = false,
     className = '',
+    style,
+    type = 'button',
     ...props
 }) => {
-    const baseStyles = {
-        height: '48px',
-        borderRadius: theme.borderRadius.lg,
+    const computedStyle = {
+        minHeight: '40px',
+        borderRadius: theme.borderRadius.md,
         fontSize: theme.typography.body.fontSize,
         fontWeight: 600,
-        border: 'none',
         cursor: disabled ? 'not-allowed' : 'pointer',
-        transition: 'all 200ms ease',
+        transition: 'background-color 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease',
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '0 24px',
+        gap: theme.spacing.sm,
+        padding: '0 16px',
         opacity: disabled ? 0.6 : 1,
-    };
-
-    const variants = {
-        primary: {
-            backgroundColor: theme.colors.primary,
-            color: 'white',
-            boxShadow: theme.shadows.button,
-            '&:hover': {
-                backgroundColor: theme.colors.primaryHover,
-            },
-        },
-        secondary: {
-            backgroundColor: theme.colors.surface,
-            color: theme.colors.textPrimary,
-            border: `1px solid ${theme.colors.border}`,
-            '&:hover': {
-                backgroundColor: '#F3F4F6',
-            },
-        },
-    };
-
-    const style = {
-        ...baseStyles,
-        ...variants[variant],
+        fontFamily: 'inherit',
+        ...variantStyles[variant],
+        ...style,
     };
 
     return (
         <button
-            style={style}
+            type={type}
+            style={computedStyle}
             onClick={onClick}
             disabled={disabled}
-            className={className}
+            className={`app-button app-button-${variant} ${className}`.trim()}
             {...props}
         >
             {children}

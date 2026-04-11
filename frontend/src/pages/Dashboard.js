@@ -1,317 +1,159 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import AppButton from '../components/ui/AppButton';
+import AppCard from '../components/ui/AppCard';
 import PageContainer from '../components/ui/PageContainer';
 import SectionHeader from '../components/ui/SectionHeader';
-import AppCard from '../components/ui/AppCard';
-import AppButton from '../components/ui/AppButton';
+import { routePaths } from '../constants/routes';
 import { theme } from '../constants/theme';
+
+const stats = [
+  { label: 'Calories logged', value: '1,850', detail: '84% of target', color: theme.colors.primary },
+  { label: 'Protein', value: '85g', detail: '35g to goal', color: theme.colors.success },
+  { label: 'Hydration', value: '6 cups', detail: '2 cups behind', color: theme.colors.accent },
+];
+
+const meals = [
+  { time: '8:00 AM', meal: 'Protein shake', cal: 250 },
+  { time: '12:30 PM', meal: 'Grilled chicken salad', cal: 450 },
+  { time: '4:00 PM', meal: 'Apple and almonds', cal: 200 },
+];
+
+const insights = [
+  {
+    title: 'Protein pacing looks strong',
+    description: 'You spread protein across three meals, which supports steadier energy and recovery.',
+    tone: theme.colors.success,
+  },
+  {
+    title: 'Hydration is your easiest win',
+    description: 'Adding two glasses of water this evening would bring today back on target.',
+    tone: theme.colors.accent,
+  },
+  {
+    title: 'Dinner can stay lighter',
+    description: 'Recent patterns show better sleep on days when your final meal lands under 600 calories.',
+    tone: theme.colors.primary,
+  },
+];
+
+const recipes = [
+  { name: 'High-protein quinoa bowl', calories: 520, protein: 42 },
+  { name: 'Salmon citrus plate', calories: 610, protein: 47 },
+  { name: 'Veggie tofu stir-fry', calories: 440, protein: 31 },
+];
 
 const Dashboard = () => {
   return (
     <PageContainer>
-      {/* Hero Welcome Section */}
-      <AppCard style={{
-        background: theme.gradients.primaryAlt,
-        color: 'white',
-        padding: `${theme.spacing.xxl} ${theme.spacing.xxl}`,
-        marginBottom: theme.spacing.xxl,
-        boxShadow: theme.shadows.hero,
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', '@media (max-width: 768px)': { flexDirection: 'column' } }}>
-          <div style={{ flex: 1 }}>
-            <h1 style={{ fontSize: '36px', fontWeight: 700, margin: 0, marginBottom: theme.spacing.sm }}>
-              Welcome back, Alex! 👋
+      <AppCard
+        style={{
+          background: theme.gradients.primary,
+          color: '#FFFFFF',
+          marginBottom: theme.spacing.xl,
+          boxShadow: theme.shadows.hero,
+        }}
+      >
+        <div className="dashboard-hero">
+          <div>
+            <p className="eyebrow-text" style={{ color: 'rgba(255, 255, 255, 0.78)', marginBottom: theme.spacing.sm }}>
+              Daily overview
+            </p>
+            <h1 style={{ ...theme.typography.heroHeading, margin: 0, marginBottom: theme.spacing.sm }}>
+              Good momentum today, Alex.
             </h1>
-            <p style={{ fontSize: '16px', opacity: 0.95, margin: 0, marginBottom: theme.spacing.lg }}>
-              You're on track today. 1,850 / 2,200 calories logged.
+            <p style={{ margin: 0, maxWidth: '560px', opacity: 0.92, fontSize: '15px' }}>
+              You are tracking close to target, protein quality is solid, and there is room for one more balanced meal.
             </p>
-            <Link to="/meal-scanner" style={{ textDecoration: 'none' }}>
-              <AppButton style={{
-                backgroundColor: 'white',
-                color: theme.colors.primary,
-                fontWeight: 600,
-              }}>
-                📸 Scan New Meal
-              </AppButton>
-            </Link>
           </div>
-          <div style={{ fontSize: '120px', opacity: 0.1, textAlign: 'right' }}>🤖</div>
+          <Link to={routePaths.scanMeal} style={{ textDecoration: 'none' }}>
+            <AppButton
+              variant="secondary"
+              style={{ backgroundColor: '#FFFFFF', color: theme.colors.primary, borderColor: 'transparent' }}
+            >
+              Scan Meal
+            </AppButton>
+          </Link>
         </div>
       </AppCard>
 
-      {/* AI Summary Card */}
-      <AppCard style={{
-        background: `linear-gradient(135deg, ${theme.colors.primary}10, ${theme.colors.secondary}10)`,
-        border: `2px solid ${theme.colors.primary}`,
-        padding: theme.spacing.xxl,
-        marginBottom: theme.spacing.xxl,
-      }}>
-        <div style={{ display: 'flex', gap: theme.spacing.lg, alignItems: 'flex-start' }}>
-          <div style={{
-            fontSize: '32px',
-            minWidth: '50px',
-          }}>
-            ✨
-          </div>
-          <div style={{ flex: 1 }}>
-            <h3 style={{ ...theme.typography.sectionHeading, color: theme.colors.primary, margin: 0, marginBottom: theme.spacing.md, fontWeight: 700 }}>
-              AI Insight for Today
-            </h3>
-            <p style={{ ...theme.typography.body, color: theme.colors.textPrimary, margin: 0, lineHeight: '1.6' }}>
-              Your meals today show consistent macronutrient balance. The AI detected a great variety of protein sources (chicken, shake, tofu) which supports muscle recovery. Keep hydration steady—you're 2 glasses of water behind today's target. 💧
-            </p>
-            <Link to="/ai-coach">
-              <AppButton variant="secondary" style={{ marginTop: theme.spacing.lg }}>
-                💬 Chat with AI Coach
-              </AppButton>
-            </Link>
-          </div>
-        </div>
-      </AppCard>
+      <div className="stats-grid" style={{ marginBottom: theme.spacing.xl }}>
+        {stats.map((stat) => (
+          <AppCard key={stat.label} style={{ padding: theme.spacing.lg }}>
+            <p className="eyebrow-text" style={{ marginBottom: theme.spacing.sm }}>{stat.label}</p>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: theme.spacing.sm }}>
+              <h2 style={{ margin: 0, color: stat.color, fontSize: '28px' }}>{stat.value}</h2>
+              <span style={{ color: theme.colors.textSecondary, fontSize: '12px' }}>{stat.detail}</span>
+            </div>
+          </AppCard>
+        ))}
+      </div>
 
-      {/* Main Grid: Today's Meals + Goals Progress */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: theme.spacing.xxl,
-        marginBottom: theme.spacing.xxl,
-        '@media (max-width: 1024px)': {
-          gridTemplateColumns: '1fr',
-        },
-      }}>
-        {/* Today's Meals Timeline */}
+      <div className="dashboard-main-grid" style={{ marginBottom: theme.spacing.xl }}>
         <AppCard>
-          <SectionHeader title="Today's Meals" />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing.lg }}>
-            {[
-              { time: '8:00 AM', meal: 'Protein Shake', cal: 250, icon: '🥤' },
-              { time: '12:30 PM', meal: 'Grilled Chicken Salad', cal: 450, icon: '🥗' },
-              { time: '4:00 PM', meal: 'Apple & Almonds', cal: 200, icon: '🍎' },
-            ].map((item, index) => (
-              <div key={index} style={{
-                display: 'flex',
-                gap: theme.spacing.md,
-                alignItems: 'center',
-                paddingBottom: index < 2 ? theme.spacing.lg : 0,
-                borderBottom: index < 2 ? `1px solid ${theme.colors.border}` : 'none',
-              }}>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '50px',
-                  height: '50px',
-                  borderRadius: theme.borderRadius.lg,
-                  backgroundColor: theme.colors.background,
-                  fontSize: '24px',
-                }}>
-                  {item.icon}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <p style={{ ...theme.typography.body, fontWeight: 600, color: theme.colors.textPrimary, margin: 0, marginBottom: theme.spacing.xs }}>
-                    {item.meal}
-                  </p>
-                  <p style={{ ...theme.typography.small, color: theme.colors.textSecondary, margin: 0 }}>
+          <SectionHeader title="Today’s meals" subtitle="Fast view of what is already logged" />
+          <div style={{ display: 'grid', gap: theme.spacing.md }}>
+            {meals.map((item) => (
+              <div key={item.time} className="list-row">
+                <div>
+                  <p style={{ margin: 0, fontWeight: 600, color: theme.colors.textPrimary }}>{item.meal}</p>
+                  <p style={{ margin: `${theme.spacing.xs} 0 0`, color: theme.colors.textSecondary, fontSize: '12px' }}>
                     {item.time}
                   </p>
                 </div>
-                <div style={{
-                  padding: '4px 12px',
-                  backgroundColor: theme.colors.secondary + '20',
-                  color: theme.colors.secondary,
-                  borderRadius: theme.borderRadius.md,
-                  fontSize: '13px',
-                  fontWeight: 600,
-                }}>
-                  {item.cal} cal
-                </div>
+                <span className="pill pill-soft">{item.cal} cal</span>
               </div>
             ))}
-            <div style={{
-              paddingTop: theme.spacing.lg,
-              borderTop: `1px solid ${theme.colors.border}`,
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}>
-              <span style={{ ...theme.typography.body, fontWeight: 600, color: theme.colors.textPrimary }}>
-                Total: 900 cal
-              </span>
-              <Link to="/meal-history" style={{ textDecoration: 'none' }}>
-                <AppButton variant="secondary" style={{ fontSize: '13px', padding: '8px 12px', height: 'auto' }}>
-                  View All →
-                </AppButton>
-              </Link>
-            </div>
+          </div>
+          <div style={{ marginTop: theme.spacing.lg }}>
+            <Link to={routePaths.mealHistory} style={{ textDecoration: 'none' }}>
+              <AppButton variant="ghost" style={{ paddingLeft: 0 }}>
+                View meal history
+              </AppButton>
+            </Link>
           </div>
         </AppCard>
 
-        {/* Goal Progress Section */}
         <AppCard>
-          <SectionHeader title="Daily Progress" />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing.xl }}>
-            {[
-              { label: 'Calories', current: 1850, target: 2200, color: theme.colors.primary },
-              { label: 'Protein', current: 85, target: 120, color: theme.colors.secondary },
-              { label: 'Water', current: 6, target: 8, color: '#3B82F6' },
-            ].map((goal, index) => (
-              <div key={index}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: theme.spacing.sm }}>
-                  <span style={{ ...theme.typography.body, fontWeight: 600, color: theme.colors.textPrimary }}>
-                    {goal.label}
-                  </span>
-                  <span style={{ ...theme.typography.body, fontWeight: 600, color: goal.color }}>
-                    {goal.current} {goal.label === 'Water' ? 'glasses' : goal.label === 'Protein' ? 'g' : 'cal'}
-                  </span>
-                </div>
-                <div style={{
-                  width: '100%',
-                  height: '12px',
-                  backgroundColor: theme.colors.border,
-                  borderRadius: '6px',
-                  overflow: 'hidden',
-                }}>
-                  <div
-                    style={{
-                      width: `${Math.min((goal.current / goal.target) * 100, 100)}%`,
-                      height: '100%',
-                      backgroundColor: goal.color,
-                      transition: 'width 300ms ease',
-                    }}
-                  />
-                </div>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  marginTop: theme.spacing.xs,
-                }}>
-                  <span style={{ ...theme.typography.small, color: theme.colors.textSecondary }}>
-                    {Math.round((goal.current / goal.target) * 100)}% complete
-                  </span>
-                  <span style={{ ...theme.typography.small, color: theme.colors.textSecondary }}>
-                    {goal.target - goal.current} to go
-                  </span>
-                </div>
+          <SectionHeader title="Recommended focus" subtitle="MVP insights replacing the old coach flow" />
+          <div style={{ display: 'grid', gap: theme.spacing.md }}>
+            {insights.map((insight) => (
+              <div
+                key={insight.title}
+                style={{
+                  padding: theme.spacing.md,
+                  backgroundColor: theme.colors.background,
+                  borderRadius: theme.borderRadius.lg,
+                  borderLeft: `4px solid ${insight.tone}`,
+                }}
+              >
+                <p style={{ margin: 0, fontWeight: 600, color: theme.colors.textPrimary }}>{insight.title}</p>
+                <p style={{ margin: `${theme.spacing.xs} 0 0`, color: theme.colors.textSecondary }}>
+                  {insight.description}
+                </p>
               </div>
             ))}
           </div>
         </AppCard>
       </div>
 
-      {/* Smart Insights Feed */}
-      <div style={{ marginBottom: theme.spacing.xxl }}>
-        <SectionHeader title="Smart Insights" subtitle="AI-generated trends and recommendations" />
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr',
-          gap: theme.spacing.lg,
-        }}>
-          {[
-            {
-              icon: '📈',
-              title: 'Consistency Streak',
-              description: 'You\'ve logged meals for 7 consecutive days. Amazing dedication!',
-              type: 'positive',
-            },
-            {
-              icon: '⚠️',
-              title: 'Hydration Alert',
-              description: 'Your water intake is 25% below target. Make sure to hydrate throughout the day.',
-              type: 'warning',
-            },
-            {
-              icon: '🎯',
-              title: 'Macro Optimization',
-              description: 'Consider adding more complex carbs to stabilize energy levels for long workouts.',
-              type: 'suggestion',
-            },
-            {
-              icon: '✨',
-              title: 'Eating Pattern',
-              description: 'AI detected you eat larger meals in the evening. This could impact sleep quality.',
-              type: 'suggestion',
-            },
-          ].map((insight, index) => (
-            <AppCard key={index} style={{
-              borderLeft: `4px solid ${insight.type === 'positive' ? theme.colors.secondary : insight.type === 'warning' ? theme.colors.danger : theme.colors.primary}`,
-            }}>
-              <div style={{ display: 'flex', gap: theme.spacing.lg }}>
-                <div style={{ fontSize: '28px' }}>{insight.icon}</div>
-                <div style={{ flex: 1 }}>
-                  <h4 style={{ ...theme.typography.body, fontWeight: 600, color: theme.colors.textPrimary, margin: 0, marginBottom: theme.spacing.xs }}>
-                    {insight.title}
-                  </h4>
-                  <p style={{ ...theme.typography.body, color: theme.colors.textSecondary, margin: 0 }}>
-                    {insight.description}
-                  </p>
-                </div>
+      <AppCard>
+        <SectionHeader title="Recipe suggestions" subtitle="Quick picks matched to your recent patterns" />
+        <div className="recipe-grid">
+          {recipes.map((recipe) => (
+            <div key={recipe.name} className="surface-panel">
+              <p style={{ margin: 0, fontWeight: 600, color: theme.colors.textPrimary }}>{recipe.name}</p>
+              <div style={{ display: 'flex', gap: theme.spacing.md, marginTop: theme.spacing.sm, color: theme.colors.textSecondary, fontSize: '12px' }}>
+                <span>{recipe.calories} cal</span>
+                <span>{recipe.protein}g protein</span>
               </div>
-            </AppCard>
+            </div>
           ))}
         </div>
-      </div>
-
-      {/* Suggested Recipes Card */}
-      <AppCard>
-        <SectionHeader title="Suggested Recipes" subtitle="Based on your nutrition patterns" />
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: theme.spacing.lg,
-        }}>
-          {[
-            { name: 'High-Protein Bowl', cal: 520, protein: 45, icon: '🥣' },
-            { name: 'Salmon Quinoa', cal: 620, protein: 48, icon: '🍣' },
-            { name: 'Veggie Stir-Fry', cal: 450, protein: 32, icon: '🥦' },
-          ].map((recipe, index) => (
-            <div
-              key={index}
-              style={{
-                padding: theme.spacing.lg,
-                backgroundColor: theme.colors.background,
-                borderRadius: theme.borderRadius.lg,
-                border: `1px solid ${theme.colors.border}`,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: theme.spacing.md,
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h4 style={{ ...theme.typography.body, fontWeight: 600, color: theme.colors.textPrimary, margin: 0 }}>
-                  {recipe.name}
-                </h4>
-                <span style={{ fontSize: '24px' }}>{recipe.icon}</span>
-              </div>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: theme.spacing.sm,
-                marginTop: theme.spacing.sm,
-              }}>
-                <div>
-                  <p style={{ ...theme.typography.small, color: theme.colors.textSecondary, margin: 0, marginBottom: theme.spacing.xs }}>
-                    Calories
-                  </p>
-                  <p style={{ ...theme.typography.body, fontWeight: 600, color: theme.colors.textPrimary, margin: 0 }}>
-                    {recipe.cal}
-                  </p>
-                </div>
-                <div>
-                  <p style={{ ...theme.typography.small, color: theme.colors.textSecondary, margin: 0, marginBottom: theme.spacing.xs }}>
-                    Protein
-                  </p>
-                  <p style={{ ...theme.typography.body, fontWeight: 600, color: theme.colors.textPrimary, margin: 0 }}>
-                    {recipe.protein}g
-                  </p>
-                </div>
-              </div>
-              <Link to="/recipe-generator" style={{ textDecoration: 'none' }}>
-                <AppButton variant="secondary" style={{ width: '100%', fontSize: '13px', height: '40px' }}>
-                  View Recipe →
-                </AppButton>
-              </Link>
-            </div>
-          ))}
+        <div style={{ marginTop: theme.spacing.lg }}>
+          <Link to={routePaths.recipes} style={{ textDecoration: 'none' }}>
+            <AppButton variant="secondary">Browse recipes</AppButton>
+          </Link>
         </div>
       </AppCard>
     </PageContainer>

@@ -91,8 +91,8 @@ const RecipeGenerator = () => {
   return (
     <PageContainer>
       <SectionHeader
-        title="Recipe Generator"
-        subtitle="AI-generated recipes tailored to your nutrition goals"
+        title="Recipes"
+        subtitle="Personalized meal ideas tailored to your nutrition goals"
       />
 
       {/* Generator CTA */}

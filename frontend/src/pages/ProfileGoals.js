@@ -32,7 +32,7 @@ const ProfileGoals = () => {
         mealReminders: true,
         goalAlerts: true,
         weeklySummary: true,
-        aiTips: false,
+        insightTips: false,
     });
 
     const [saveMessage, setSaveMessage] = useState('');
@@ -347,11 +347,11 @@ const ProfileGoals = () => {
                             <label style={{ display: 'flex', alignItems: 'center', gap: theme.spacing.md, cursor: 'pointer' }}>
                                 <input
                                     type="checkbox"
-                                    checked={notifications.aiTips}
-                                    onChange={() => handleNotificationChange('aiTips')}
+                                    checked={notifications.insightTips}
+                                    onChange={() => handleNotificationChange('insightTips')}
                                     style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                                 />
-                                <span style={{ ...theme.typography.body, color: theme.colors.textPrimary }}>💡 AI Tips</span>
+                                <span style={{ ...theme.typography.body, color: theme.colors.textPrimary }}>💡 Insight Tips</span>
                             </label>
                         </div>
                     </div>

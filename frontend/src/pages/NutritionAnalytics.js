@@ -36,7 +36,7 @@ const NutritionAnalytics = () => {
   return (
     <PageContainer>
       <SectionHeader
-        title="Nutrition Analytics"
+        title="Analytics"
         subtitle="Deep dive into your nutrition data and weekly trends."
       />
 
