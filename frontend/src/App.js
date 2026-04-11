@@ -1,37 +1,24 @@
-import { useState } from "react";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Layout from './components/layout/Layout';
+import Dashboard from './pages/Dashboard';
+import LogMeal from './pages/LogMeal';
+import Habits from './pages/Habits';
+import Insights from './pages/Insights';
+import './App.css';
 
 function App() {
-  const [food, setFood] = useState("");
-  const [calories, setCalories] = useState("");
-
-  const submitMeal = async () => {
-    await fetch("http://127.0.0.1:8000/meals/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        food_label: food,
-        calories: parseFloat(calories)
-      })
-    });
-    alert("Meal logged!");
-  };
-
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>ChewliticsAI</h1>
-      <input
-        placeholder="Food Label"
-        onChange={(e) => setFood(e.target.value)}
-      />
-      <input
-        placeholder="Calories"
-        type="number"
-        onChange={(e) => setCalories(e.target.value)}
-      />
-      <button onClick={submitMeal}>Log Meal</button>
-    </div>
+    <Router>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/log-meal" element={<LogMeal />} />
+          <Route path="/habits" element={<Habits />} />
+          <Route path="/insights" element={<Insights />} />
+        </Routes>
+      </Layout>
+    </Router>
   );
 }
 
