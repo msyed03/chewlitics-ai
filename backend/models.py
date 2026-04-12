@@ -9,13 +9,14 @@ class Meal(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(String, default="default_user", index=True)  # MVP: hardcoded user
-    food_label = Column(String, index=True)
-    meal_description = Column(Text)  # Original natural language description
+    original_description = Column(Text)  # Original natural language description
+    parsed_ingredients = Column(Text)  # JSON string of parsed ingredients
     calories = Column(Float, default=0)
     protein = Column(Float, default=0)  # grams
     carbs = Column(Float, default=0)  # grams
     fat = Column(Float, default=0)  # grams
     fiber = Column(Float, default=0)  # grams
+    meal_type = Column(String, nullable=True)  # breakfast, lunch, dinner, snack
     timestamp = Column(DateTime, default=datetime.utcnow, index=True)
 
     # Relationship to ingredients

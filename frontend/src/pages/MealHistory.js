@@ -1,43 +1,97 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PageContainer from '../components/ui/PageContainer';
 import SectionHeader from '../components/ui/SectionHeader';
 import AppCard from '../components/ui/AppCard';
 import AppButton from '../components/ui/AppButton';
 import { theme } from '../constants/theme';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
 const MealHistory = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState('all');
+    const [meals, setMeals] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [editingMeal, setEditingMeal] = useState(null);
+    const [editForm, setEditForm] = useState({ description: '', mealType: '' });
 
-    const meals = [
-        {
-            date: 'Today', items: [
-                { name: 'Grilled Chicken Salad', time: '12:30 PM', calories: 450, confidence: 98, type: 'lunch' },
-                { name: 'Protein Shake', time: '4:00 PM', calories: 250, confidence: 95, type: 'snack' },
-                { name: 'Brown Rice & Broccoli', time: '7:00 PM', calories: 520, confidence: 92, type: 'dinner' },
-            ]
-        },
-        {
-            date: 'Yesterday', items: [
-                { name: 'Oatmeal with Berries', time: '8:00 AM', calories: 380, confidence: 94, type: 'breakfast' },
-                { name: 'Tuna Sandwich', time: '12:45 PM', calories: 520, confidence: 89, type: 'lunch' },
-                { name: 'Grilled Fish & Vegetables', time: '6:30 PM', calories: 580, confidence: 96, type: 'dinner' },
-            ]
-        },
-        {
-            date: '2 Days Ago', items: [
-                { name: 'Eggs & Toast', time: '7:30 AM', calories: 420, confidence: 91, type: 'breakfast' },
-                { name: 'Caesar Salad', time: '1:00 PM', calories: 380, confidence: 87, type: 'lunch' },
-                { name: 'Turkey Tacos', time: '6:45 PM', calories: 580, confidence: 90, type: 'dinner' },
-            ]
-        },
-    ];
+    useEffect(() => {
+        fetchMeals();
+    }, []);
 
-    const filteredMeals = meals.map(dayGroup => ({
-        ...dayGroup,
-        items: dayGroup.items.filter(meal => {
-            const matchesSearch = meal.name.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesFilter = filterType === 'all' || meal.type === filterType;
+    const fetchMeals = async () => {
+        try {
+            setLoading(true);
+            const response = await fetch(`${API_BASE_URL}/meals`);
+            if (!response.ok) throw new Error('Failed to fetch meals');
+            const data = await response.json();
+            setMeals(data);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDeleteMeal = async (mealId) => {
+        // eslint-disable-next-line no-restricted-globals
+        const confirmed = window['confirm']('Are you sure you want to delete this meal?');
+        if (!confirmed) return;
+        try {
+            const response = await fetch(`${API_BASE_URL}/meals/${mealId}`, { method: 'DELETE' });
+            if (!response.ok) throw new Error('Failed to delete meal');
+            setMeals(meals.filter(meal => meal.id !== mealId));
+        } catch (err) {
+            alert('Error deleting meal: ' + err.message);
+        }
+    };
+
+    const handleEditMeal = (meal) => {
+        setEditingMeal(meal);
+        setEditForm({
+            description: meal.original_description,
+            mealType: meal.meal_type || ''
+        });
+    };
+
+    const handleSaveEdit = async () => {
+        if (!editingMeal) return;
+        try {
+            const response = await fetch(`${API_BASE_URL}/meals/${editingMeal.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    original_description: editForm.description,
+                    meal_type: editForm.mealType || null
+                })
+            });
+            if (!response.ok) throw new Error('Failed to update meal');
+            const updatedMeal = await response.json();
+            setMeals(meals.map(meal => meal.id === editingMeal.id ? updatedMeal : meal));
+            setEditingMeal(null);
+        } catch (err) {
+            alert('Error updating meal: ' + err.message);
+        }
+    };
+
+    const handleCancelEdit = () => {
+        setEditingMeal(null);
+    };
+
+    // Group meals by date
+    const groupedMeals = meals.reduce((groups, meal) => {
+        const date = new Date(meal.timestamp).toLocaleDateString();
+        if (!groups[date]) groups[date] = [];
+        groups[date].push(meal);
+        return groups;
+    }, {});
+
+    const filteredMeals = Object.entries(groupedMeals).map(([date, dayMeals]) => ({
+        date,
+        items: dayMeals.filter(meal => {
+            const matchesSearch = meal.original_description.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesFilter = filterType === 'all' || (meal.meal_type && meal.meal_type === filterType);
             return matchesSearch && matchesFilter;
         })
     })).filter(dayGroup => dayGroup.items.length > 0);
@@ -46,6 +100,29 @@ const MealHistory = () => {
         const icons = { breakfast: '🥣', lunch: '🥗', dinner: '🍗', snack: '🥪' };
         return icons[type] || '🍽️';
     };
+
+    if (loading) {
+        return (
+            <PageContainer>
+                <SectionHeader title="Meal History" subtitle="Loading your meals..." />
+                <AppCard style={{ textAlign: 'center', padding: theme.spacing.xxl }}>
+                    <p>Loading...</p>
+                </AppCard>
+            </PageContainer>
+        );
+    }
+
+    if (error) {
+        return (
+            <PageContainer>
+                <SectionHeader title="Meal History" subtitle="Error loading meals" />
+                <AppCard style={{ textAlign: 'center', padding: theme.spacing.xxl }}>
+                    <p style={{ color: theme.colors.danger }}>{error}</p>
+                    <AppButton onClick={fetchMeals}>Retry</AppButton>
+                </AppCard>
+            </PageContainer>
+        );
+    }
 
     return (
         <PageContainer>
@@ -124,15 +201,15 @@ const MealHistory = () => {
                                             minWidth: '50px',
                                             textAlign: 'center',
                                         }}>
-                                            {getMealIcon(meal.type)}
+                                            {getMealIcon(meal.meal_type)}
                                         </div>
                                         <div style={{ flex: 1 }}>
                                             <h4 style={{ ...theme.typography.body, fontWeight: 600, color: theme.colors.textPrimary, margin: 0, marginBottom: theme.spacing.sm }}>
-                                                {meal.name}
+                                                {meal.original_description}
                                             </h4>
                                             <div style={{ display: 'flex', gap: theme.spacing.lg, flexWrap: 'wrap', marginBottom: theme.spacing.md }}>
                                                 <span style={{ ...theme.typography.small, color: theme.colors.textSecondary }}>
-                                                    ⏰ {meal.time}
+                                                    ⏰ {new Date(meal.timestamp + 'Z').toLocaleTimeString()}
                                                 </span>
                                                 <span style={{
                                                     ...theme.typography.small,
@@ -143,17 +220,7 @@ const MealHistory = () => {
                                                     fontWeight: 600,
                                                     textTransform: 'capitalize',
                                                 }}>
-                                                    {meal.type}
-                                                </span>
-                                                <span style={{
-                                                    ...theme.typography.small,
-                                                    padding: '2px 8px',
-                                                    backgroundColor: `${theme.colors.primary}20`,
-                                                    color: theme.colors.primary,
-                                                    borderRadius: theme.borderRadius.sm,
-                                                    fontWeight: 600,
-                                                }}>
-                                                    AI Confidence: {meal.confidence}%
+                                                    {meal.meal_type || 'meal'}
                                                 </span>
                                             </div>
                                         </div>
@@ -165,10 +232,18 @@ const MealHistory = () => {
                                                 calories
                                             </p>
                                             <div style={{ display: 'flex', gap: theme.spacing.sm, marginTop: theme.spacing.md }}>
-                                                <AppButton variant="secondary" style={{ fontSize: '12px', height: 'auto', padding: '6px 12px' }}>
+                                                <AppButton
+                                                    variant="secondary"
+                                                    style={{ fontSize: '12px', height: 'auto', padding: '6px 12px' }}
+                                                    onClick={() => handleEditMeal(meal)}
+                                                >
                                                     ✏️ Edit
                                                 </AppButton>
-                                                <AppButton variant="secondary" style={{ fontSize: '12px', height: 'auto', padding: '6px 12px' }}>
+                                                <AppButton
+                                                    variant="secondary"
+                                                    style={{ fontSize: '12px', height: 'auto', padding: '6px 12px' }}
+                                                    onClick={() => handleDeleteMeal(meal.id)}
+                                                >
                                                     🗑️ Delete
                                                 </AppButton>
                                             </div>
@@ -200,7 +275,7 @@ const MealHistory = () => {
                             Total Meals Logged
                         </p>
                         <p style={{ ...theme.typography.heroHeading, color: theme.colors.primary, margin: 0 }}>
-                            156
+                            {meals.length}
                         </p>
                     </div>
                     <div style={{ textAlign: 'center', padding: theme.spacing.lg, backgroundColor: theme.colors.background, borderRadius: theme.borderRadius.lg }}>
@@ -208,19 +283,107 @@ const MealHistory = () => {
                             Avg. Daily Calories
                         </p>
                         <p style={{ ...theme.typography.heroHeading, color: theme.colors.secondary, margin: 0 }}>
-                            2,150
+                            {meals.length > 0 ? Math.round(meals.reduce((sum, m) => sum + m.calories, 0) / Math.max(1, new Set(meals.map(m => new Date(m.timestamp).toDateString())).size)) : 0}
                         </p>
                     </div>
                     <div style={{ textAlign: 'center', padding: theme.spacing.lg, backgroundColor: theme.colors.background, borderRadius: theme.borderRadius.lg }}>
                         <p style={{ ...theme.typography.small, color: theme.colors.textSecondary, margin: 0, marginBottom: theme.spacing.sm }}>
-                            Scanning Streak
+                            Total Days Logged
                         </p>
                         <p style={{ ...theme.typography.heroHeading, color: '#F59E0B', margin: 0 }}>
-                            12 days
+                            {new Set(meals.map(m => new Date(m.timestamp).toDateString())).size}
                         </p>
                     </div>
                 </div>
             </AppCard>
+
+            {/* Edit Modal */}
+            {editingMeal && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000,
+                }}>
+                    <AppCard style={{
+                        width: '90%',
+                        maxWidth: '500px',
+                        maxHeight: '80vh',
+                        overflow: 'auto',
+                    }}>
+                        <SectionHeader title="Edit Meal" />
+                        <div style={{ marginBottom: theme.spacing.lg }}>
+                            <label style={{
+                                display: 'block',
+                                marginBottom: theme.spacing.sm,
+                                fontWeight: 600,
+                                color: theme.colors.textPrimary,
+                            }}>
+                                Meal Description
+                            </label>
+                            <textarea
+                                value={editForm.description}
+                                onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                                style={{
+                                    width: '100%',
+                                    minHeight: '100px',
+                                    padding: theme.spacing.md,
+                                    border: `1px solid ${theme.colors.border}`,
+                                    borderRadius: theme.borderRadius.md,
+                                    fontSize: theme.typography.body.fontSize,
+                                    fontFamily: 'inherit',
+                                    outline: 'none',
+                                    resize: 'vertical',
+                                }}
+                                placeholder="Describe your meal..."
+                            />
+                        </div>
+                        <div style={{ marginBottom: theme.spacing.xl }}>
+                            <label style={{
+                                display: 'block',
+                                marginBottom: theme.spacing.sm,
+                                fontWeight: 600,
+                                color: theme.colors.textPrimary,
+                            }}>
+                                Meal Type
+                            </label>
+                            <select
+                                value={editForm.mealType}
+                                onChange={(e) => setEditForm({ ...editForm, mealType: e.target.value })}
+                                style={{
+                                    width: '100%',
+                                    padding: theme.spacing.md,
+                                    border: `1px solid ${theme.colors.border}`,
+                                    borderRadius: theme.borderRadius.md,
+                                    fontSize: theme.typography.body.fontSize,
+                                    outline: 'none',
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                <option value="">Select meal type...</option>
+                                <option value="breakfast">Breakfast</option>
+                                <option value="lunch">Lunch</option>
+                                <option value="dinner">Dinner</option>
+                                <option value="snack">Snack</option>
+                            </select>
+                        </div>
+                        <div style={{ display: 'flex', gap: theme.spacing.md, justifyContent: 'flex-end' }}>
+                            <AppButton variant="secondary" onClick={handleCancelEdit}>
+                                Cancel
+                            </AppButton>
+                            <AppButton onClick={handleSaveEdit}>
+                                Save Changes
+                            </AppButton>
+                        </div>
+                    </AppCard>
+                </div>
+            )}
         </PageContainer>
     );
 };

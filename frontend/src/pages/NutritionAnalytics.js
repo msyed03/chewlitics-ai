@@ -1,18 +1,87 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PageContainer from '../components/ui/PageContainer';
 import SectionHeader from '../components/ui/SectionHeader';
 import AppCard from '../components/ui/AppCard';
 import AppButton from '../components/ui/AppButton';
 import { theme } from '../constants/theme';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
 const NutritionAnalytics = () => {
   const [period, setPeriod] = useState('week');
+  const [analyticsData, setAnalyticsData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const macroData = [
-    { label: 'Protein', current: 108, target: 120, unit: 'g', color: theme.colors.secondary, icon: '💪' },
-    { label: 'Carbohydrates', current: 245, target: 275, unit: 'g', color: theme.colors.primary, icon: '🌾' },
-    { label: 'Fat', current: 78, target: 85, unit: 'g', color: '#F59E0B', icon: '🥑' },
-  ];
+  useEffect(() => {
+    fetchAnalytics();
+  }, [period]);
+
+  const fetchAnalytics = async () => {
+    try {
+      setLoading(true);
+      const endpoint = period === 'day' ? '/analytics/daily' : '/analytics/weekly';
+      const response = await fetch(`${API_BASE_URL}${endpoint}`);
+      if (!response.ok) throw new Error('Failed to fetch analytics');
+      const data = await response.json();
+      setAnalyticsData(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <PageContainer>
+        <SectionHeader title="Analytics" subtitle="Loading your nutrition data..." />
+        <AppCard style={{ textAlign: 'center', padding: theme.spacing.xxl }}>
+          <p>Loading...</p>
+        </AppCard>
+      </PageContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageContainer>
+        <SectionHeader title="Analytics" subtitle="Error loading analytics" />
+        <AppCard style={{ textAlign: 'center', padding: theme.spacing.xxl }}>
+          <p style={{ color: theme.colors.danger }}>{error}</p>
+          <AppButton onClick={fetchAnalytics}>Retry</AppButton>
+        </AppCard>
+      </PageContainer>
+    );
+  }
+
+  // Mock data for now, will be replaced with real calculations
+  const macroData = analyticsData ? [
+    {
+      label: 'Protein',
+      current: period === 'day' ? (analyticsData.daily_summary?.total_protein || 0) : (analyticsData.weekly_summary?.avg_daily_protein || 0),
+      target: 120,
+      unit: 'g',
+      color: theme.colors.secondary,
+      icon: '💪'
+    },
+    {
+      label: 'Carbohydrates',
+      current: period === 'day' ? (analyticsData.daily_summary?.total_carbs || 0) : (analyticsData.weekly_summary?.avg_daily_carbs || 0),
+      target: 275,
+      unit: 'g',
+      color: theme.colors.primary,
+      icon: '🌾'
+    },
+    {
+      label: 'Fat',
+      current: period === 'day' ? (analyticsData.daily_summary?.total_fat || 0) : (analyticsData.weekly_summary?.avg_daily_fat || 0),
+      target: 85,
+      unit: 'g',
+      color: '#F59E0B',
+      icon: '🥑'
+    },
+  ] : [];
 
   const micronutrients = [
     { name: 'Vitamin C', value: '125%', status: 'Good', icon: '🍊' },
@@ -23,15 +92,20 @@ const NutritionAnalytics = () => {
     { name: 'Zinc', value: '95%', status: 'Good', icon: '🦪' },
   ];
 
-  const weeklyCalories = [
-    { day: 'Mon', calories: 2100, target: 2200 },
-    { day: 'Tue', calories: 1950, target: 2200 },
-    { day: 'Wed', calories: 2200, target: 2200 },
-    { day: 'Thu', calories: 1850, target: 2200 },
-    { day: 'Fri', calories: 2000, target: 2200 },
-    { day: 'Sat', calories: 2300, target: 2200 },
-    { day: 'Sun', calories: 1900, target: 2200 },
-  ];
+  const weeklyCalories = analyticsData && period === 'week' ?
+    (analyticsData.daily_breakdown || []).map(day => ({
+      day: new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' }),
+      calories: day.total_calories,
+      target: 2200,
+    })) : [
+      { day: 'Mon', calories: 2100, target: 2200 },
+      { day: 'Tue', calories: 1950, target: 2200 },
+      { day: 'Wed', calories: 2200, target: 2200 },
+      { day: 'Thu', calories: 1850, target: 2200 },
+      { day: 'Fri', calories: 2000, target: 2200 },
+      { day: 'Sat', calories: 2300, target: 2200 },
+      { day: 'Sun', calories: 1900, target: 2200 },
+    ];
 
   return (
     <PageContainer>
@@ -47,7 +121,7 @@ const NutritionAnalytics = () => {
             View by:
           </h3>
           <div style={{ display: 'flex', gap: theme.spacing.md }}>
-            {['day', 'week', 'month'].map((p) => (
+            {['day', 'week'].map((p) => (
               <AppButton
                 key={p}
                 variant={period === p ? 'primary' : 'secondary'}
@@ -110,7 +184,9 @@ const NutritionAnalytics = () => {
           <SectionHeader title="Calorie Trends" />
           <div>
             <p style={{ ...theme.typography.small, color: theme.colors.textSecondary, margin: 0, marginBottom: theme.spacing.lg }}>
-              {period === 'week' ? '7-day' : period === 'month' ? '30-day' : 'Daily'} average: <strong style={{ color: theme.colors.textPrimary }}>2,049 calories</strong>
+              {period === 'week' ? '7-day' : 'Daily'} average: <strong style={{ color: theme.colors.textPrimary }}>
+                {period === 'day' ? (analyticsData?.daily_summary?.total_calories || 0).toFixed(0) : (analyticsData?.weekly_summary?.avg_daily_calories || 0).toFixed(0)} calories
+              </strong>
             </p>
             <div style={{ display: 'flex', gap: theme.spacing.sm, alignItems: 'end', height: '200px', marginBottom: theme.spacing.lg }}>
               {weeklyCalories.map((stat, index) => (

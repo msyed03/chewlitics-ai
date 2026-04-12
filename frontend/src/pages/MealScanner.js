@@ -9,6 +9,7 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 const MealScanner = () => {
     const [mealDescription, setMealDescription] = useState('');
+    const [mealType, setMealType] = useState('');
     const [parsedMeal, setParsedMeal] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -52,13 +53,14 @@ const MealScanner = () => {
 
         try {
             const mealData = {
-                food_label: mealDescription.substring(0, 50),
-                meal_description: mealDescription,
+                original_description: mealDescription,
+                parsed_ingredients: JSON.stringify(parsedMeal.ingredients),
                 calories: parsedMeal.total_nutrition.calories,
                 protein: parsedMeal.total_nutrition.protein,
                 carbs: parsedMeal.total_nutrition.carbs,
                 fat: parsedMeal.total_nutrition.fat,
                 fiber: parsedMeal.total_nutrition.fiber || 0,
+                meal_type: mealType || null,
                 ingredients: parsedMeal.ingredients,
             };
 
@@ -74,7 +76,9 @@ const MealScanner = () => {
 
             // Success
             setMealDescription('');
+            setMealType('');
             setParsedMeal(null);
+            setError(null);
             alert('Meal saved successfully!');
         } catch (err) {
             const errorMsg = err.message || 'Error saving meal. Make sure backend is running.';
@@ -87,16 +91,76 @@ const MealScanner = () => {
 
     const handleReset = () => {
         setMealDescription('');
+        setMealType('');
         setParsedMeal(null);
         setError(null);
+    };
+
+    const handleMealTypeToggle = (type) => {
+        setMealType(mealType === type ? '' : type);
     };
 
     return (
         <PageContainer>
             <SectionHeader
                 title="Log Your Meal"
-                subtitle="Describe what you ate and we'll analyze the nutrition instantly."
             />
+
+            {/* ===== MEAL TYPE SELECTOR ===== */}
+            <div style={{ marginBottom: theme.spacing.xxl }}>
+                <AppCard style={{ padding: theme.spacing.lg }}>
+                    <div style={{ marginBottom: theme.spacing.md }}>
+                        <h3 style={{
+                            ...theme.typography.body,
+                            fontWeight: 600,
+                            color: theme.colors.textPrimary,
+                            margin: 0,
+                            marginBottom: theme.spacing.sm,
+                        }}>
+                            🍽️ Meal Type (Optional)
+                        </h3>
+                        <p style={{
+                            ...theme.typography.small,
+                            color: theme.colors.textSecondary,
+                            margin: 0,
+                        }}>
+                            Select the type of meal you're logging
+                        </p>
+                    </div>
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+                        gap: theme.spacing.md,
+                    }}>
+                        {[
+                            { value: 'breakfast', label: 'Breakfast', icon: '🥣' },
+                            { value: 'lunch', label: 'Lunch', icon: '🥗' },
+                            { value: 'dinner', label: 'Dinner', icon: '🍽️' },
+                            { value: 'snack', label: 'Snack', icon: '🍿' },
+                        ].map((type) => (
+                            <AppButton
+                                key={type.value}
+                                variant={mealType === type.value ? 'primary' : 'secondary'}
+                                onClick={() => handleMealTypeToggle(type.value)}
+                                style={{
+                                    height: '60px',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: theme.spacing.xs,
+                                    fontSize: '12px',
+                                    fontWeight: mealType === type.value ? 600 : 500,
+                                    border: mealType === type.value ? `2px solid ${theme.colors.primary}` : `1px solid ${theme.colors.border}`,
+                                }}
+                            >
+                                <span style={{ fontSize: '20px' }}>{type.icon}</span>
+                                {type.label}
+                            </AppButton>
+                        ))}
+                    </div>
+                </AppCard>
+            </div>
 
             {/* ===== DESCRIBE YOUR MEAL SECTION ===== */}
             <div style={{ marginBottom: theme.spacing.xxl }}>

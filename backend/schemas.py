@@ -42,20 +42,28 @@ class MealIngredientResponse(BaseModel):
     fiber: float
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class MealCreate(BaseModel):
     """Request to create/save a meal."""
 
-    food_label: str
-    meal_description: str
+    original_description: str
+    parsed_ingredients: str  # JSON string
     calories: float
     protein: float
     carbs: float
     fat: float
     fiber: float
+    meal_type: Optional[str] = None
     ingredients: List[MealIngredientResponse]
+
+
+class MealUpdate(BaseModel):
+    """Request to update a meal."""
+
+    original_description: Optional[str] = None
+    meal_type: Optional[str] = None
 
 
 class MealResponse(BaseModel):
@@ -63,18 +71,19 @@ class MealResponse(BaseModel):
 
     id: int
     user_id: str
-    food_label: str
-    meal_description: str
+    original_description: str
+    parsed_ingredients: str
     calories: float
     protein: float
     carbs: float
     fat: float
     fiber: float
+    meal_type: Optional[str]
     timestamp: datetime
     ingredients: List[MealIngredientResponse] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class DailyNutritionSummary(BaseModel):
@@ -93,4 +102,26 @@ class AnalyticsResponse(BaseModel):
     """Analytics data."""
 
     daily_summary: DailyNutritionSummary
+    meals: List[MealResponse] = []
+
+
+class WeeklyNutritionSummary(BaseModel):
+    """Weekly nutrition averages."""
+
+    week_start: str
+    week_end: str
+    avg_daily_calories: float
+    avg_daily_protein: float
+    avg_daily_carbs: float
+    avg_daily_fat: float
+    avg_daily_fiber: float
+    total_meals_logged: int
+    days_logged: int
+
+
+class WeeklyAnalyticsResponse(BaseModel):
+    """Weekly analytics data."""
+
+    weekly_summary: WeeklyNutritionSummary
+    daily_breakdown: List[DailyNutritionSummary] = []
     meals: List[MealResponse] = []
