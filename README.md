@@ -1,8 +1,38 @@
-### Project Structure
+# Chewlitics AI
+
+A nutrition logging MVP with a React frontend and FastAPI backend.
+
+## Run locally
+
+1. Start the backend
+
+```bash
+cd backend
+pip install -r requirements.txt
+python -m uvicorn main:app --reload
+```
+
+- Backend default URL: `http://localhost:8000`
+- API docs: `http://localhost:8000/docs`
+
+2. Start the frontend
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+- Frontend default URL: `http://localhost:3000`
+
+> Run the backend first so the frontend can connect to the API.
+
+## Project structure
+
 ```
 chewlitics-ai/
 │
-├── backend/                          # Python FastAPI/Flask backend server
+├── backend/                          # Python FastAPI backend server
 │   ├── main.py                       # App entry point, API routes
 │   ├── models.py                     # Database models (users, meals, nutrition data, etc.)
 │   ├── database.py                   # Database connection & session config

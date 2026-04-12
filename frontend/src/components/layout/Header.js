@@ -32,22 +32,10 @@ const Header = ({ onMenuClick, isDesktop }) => {
         flexShrink: 0,
     };
 
-    const logoSquareStyle = {
-        width: '36px',
-        height: '36px',
-        borderRadius: theme.borderRadius.md,
-        overflow: 'hidden',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: theme.colors.surface,
-        boxShadow: theme.shadows.button,
-    };
-
     const logoImageStyle = {
-        width: '100%',
-        height: '100%',
-        objectFit: 'cover',
+        width: '42px',
+        height: '42px',
+        objectFit: 'contain',
         display: 'block',
     };
 
@@ -101,9 +89,7 @@ const Header = ({ onMenuClick, isDesktop }) => {
                     <MdMenu size={22} />
                 </button>
                 <NavLink to={routePaths.dashboard} style={brandStyle}>
-                    <div style={logoSquareStyle}>
-                        <img src="/logo192.png" alt="Chewlitics AI logo" style={logoImageStyle} />
-                    </div>
+                    <img src="/logo192.png" alt="Chewlitics AI logo" style={logoImageStyle} />
                     <h1 style={titleStyle}>Chewlitics AI</h1>
                 </NavLink>
             </div>
