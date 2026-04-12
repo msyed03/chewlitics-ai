@@ -5,265 +5,496 @@ import AppCard from '../components/ui/AppCard';
 import AppButton from '../components/ui/AppButton';
 import { theme } from '../constants/theme';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
 const MealScanner = () => {
-  const [scannedMeal, setScannedMeal] = useState(null);
-  
-  const handleScan = () => {
-    setScannedMeal({
-      name: 'Grilled Chicken with Roasted Vegetables',
-      confidence: 98,
-      calories: 520,
-      protein: 45,
-      carbs: 28,
-      fat: 18,
-      ingredients: ['Chicken Breast', 'Broccoli', 'Carrots', 'Olive Oil']
-    });
-  };
+    const [mealDescription, setMealDescription] = useState('');
+    const [parsedMeal, setParsedMeal] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-  const recentScans = [
-    { name: 'Grilled Chicken with Vegetables', date: 'Today 12:30 PM', confidence: 98, icon: '🍗' },
-    { name: 'Protein Shake', date: 'Today 8:00 AM', confidence: 95, icon: '🥤' },
-    { name: 'Salad Bowl', date: 'Yesterday 1:15 PM', confidence: 92, icon: '🥗' },
-    { name: 'Oatmeal with Berries', date: 'Yesterday 7:45 AM', confidence: 94, icon: '🥣' },
-  ];
+    const handleParseMeal = async () => {
+        if (!mealDescription.trim()) {
+            setError('Please enter a meal description');
+            return;
+        }
 
-  return (
-    <PageContainer>
-      <SectionHeader
-        title="Scan Meal"
-        subtitle="Use AI to scan, analyze, and log your meals instantly."
-      />
+        setLoading(true);
+        setError(null);
 
-      {/* Main Scan Area */}
-      <div style={{ marginBottom: theme.spacing.xxl }}>
-        <AppCard style={{
-          padding: theme.spacing.xxl,
-          textAlign: 'center',
-          background: `linear-gradient(135deg, ${theme.colors.primary}15, ${theme.colors.secondary}15)`,
-          border: `2px dashed ${theme.colors.primary}`,
-        }}>
-          <div style={{ marginBottom: theme.spacing.lg }}>
-            <div style={{
-              fontSize: '80px',
-              marginBottom: theme.spacing.md,
-              animation: 'pulse 2s ease-in-out infinite',
-            }}>
-              📸
-            </div>
-            <h2 style={{
-              ...theme.typography.sectionHeading,
-              color: theme.colors.textPrimary,
-              marginBottom: theme.spacing.sm,
-            }}>
-              Point & Analyze
-            </h2>
-            <p style={{
-              ...theme.typography.body,
-              color: theme.colors.textSecondary,
-              maxWidth: '500px',
-              margin: `0 auto ${theme.spacing.lg}`,
-            }}>
-              Take a photo of your meal and our AI will instantly identify ingredients, estimate calories, and break down macronutrients.
-            </p>
-          </div>
-          <div style={{ display: 'flex', gap: theme.spacing.md, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <AppButton onClick={handleScan} style={{ fontSize: '16px', fontWeight: 600 }}>
-              📷 Scan Meal
-            </AppButton>
-            <AppButton variant="secondary">📁 Upload Photo</AppButton>
-          </div>
-        </AppCard>
-      </div>
+        try {
+            const response = await fetch(`${API_BASE_URL}/nutrition/parse-meal`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ meal_description: mealDescription }),
+            });
 
-      {/* Scanned Meal Result */}
-      {scannedMeal && (
-        <AppCard style={{ marginBottom: theme.spacing.xxl, background: `linear-gradient(135deg, ${theme.colors.secondary}10, ${theme.colors.primary}10)` }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: theme.spacing.lg }}>
-            <h3 style={{ ...theme.typography.sectionHeading, color: theme.colors.textPrimary, margin: 0 }}>
-              ✅ Analysis Complete
-            </h3>
-            <span style={{
-              padding: '4px 12px',
-              backgroundColor: theme.colors.secondary + '30',
-              color: theme.colors.secondary,
-              borderRadius: theme.borderRadius.md,
-              fontWeight: 600,
-              fontSize: '13px',
-            }}>
-              {scannedMeal.confidence}% Confidence
-            </span>
-          </div>
-          <AppCard style={{ marginBottom: theme.spacing.lg, boxShadow: 'none', border: 'none' }}>
-            <h4 style={{ ...theme.typography.body, fontWeight: 600, color: theme.colors.textPrimary, margin: 0, marginBottom: theme.spacing.lg }}>
-              {scannedMeal.name}
-            </h4>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: theme.spacing.md, marginBottom: theme.spacing.lg }}>
-              <div style={{ textAlign: 'center', padding: theme.spacing.md, backgroundColor: theme.colors.background, borderRadius: theme.borderRadius.lg }}>
-                <p style={{ ...theme.typography.small, color: theme.colors.textSecondary, margin: 0, marginBottom: theme.spacing.xs }}>
-                  Calories
-                </p>
-                <p style={{ ...theme.typography.sectionHeading, color: theme.colors.primary, margin: 0 }}>
-                  {scannedMeal.calories}
-                </p>
-              </div>
-              <div style={{ textAlign: 'center', padding: theme.spacing.md, backgroundColor: theme.colors.background, borderRadius: theme.borderRadius.lg }}>
-                <p style={{ ...theme.typography.small, color: theme.colors.textSecondary, margin: 0, marginBottom: theme.spacing.xs }}>
-                  Protein
-                </p>
-                <p style={{ ...theme.typography.sectionHeading, color: theme.colors.secondary, margin: 0 }}>
-                  {scannedMeal.protein}g
-                </p>
-              </div>
-              <div style={{ textAlign: 'center', padding: theme.spacing.md, backgroundColor: theme.colors.background, borderRadius: theme.borderRadius.lg }}>
-                <p style={{ ...theme.typography.small, color: theme.colors.textSecondary, margin: 0, marginBottom: theme.spacing.xs }}>
-                  Carbs
-                </p>
-                <p style={{ ...theme.typography.sectionHeading, color: '#F59E0B', margin: 0 }}>
-                  {scannedMeal.carbs}g
-                </p>
-              </div>
-              <div style={{ textAlign: 'center', padding: theme.spacing.md, backgroundColor: theme.colors.background, borderRadius: theme.borderRadius.lg }}>
-                <p style={{ ...theme.typography.small, color: theme.colors.textSecondary, margin: 0, marginBottom: theme.spacing.xs }}>
-                  Fat
-                </p>
-                <p style={{ ...theme.typography.sectionHeading, color: '#3B82F6', margin: 0 }}>
-                  {scannedMeal.fat}g
-                </p>
-              </div>
-            </div>
-            <div>
-              <h5 style={{ ...theme.typography.body, fontWeight: 600, color: theme.colors.textPrimary, margin: 0, marginBottom: theme.spacing.md }}>
-                Detected Ingredients:
-              </h5>
-              <div style={{ display: 'flex', gap: theme.spacing.md, flexWrap: 'wrap' }}>
-                {scannedMeal.ingredients.map((ingredient, index) => (
-                  <span
-                    key={index}
-                    style={{
-                      padding: '6px 12px',
-                      backgroundColor: theme.colors.border,
-                      borderRadius: theme.borderRadius.md,
-                      fontSize: '13px',
-                      fontWeight: 500,
-                      color: theme.colors.textPrimary,
-                    }}
-                  >
-                    {ingredient}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </AppCard>
-          <div style={{ display: 'flex', gap: theme.spacing.md }}>
-            <AppButton style={{ flex: 1 }}>✅ Log This Meal</AppButton>
-            <AppButton variant="secondary" style={{ flex: 1 }}>🔄 Rescan</AppButton>
-            <AppButton variant="secondary" style={{ flex: 1 }}>✏️ Edit Details</AppButton>
-          </div>
-        </AppCard>
-      )}
+            if (!response.ok) {
+                throw new Error('Failed to parse meal');
+            }
 
-      {/* How It Works */}
-      <AppCard style={{ marginBottom: theme.spacing.xxl }}>
-        <SectionHeader title="How It Works" />
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: theme.spacing.xl,
-        }}>
-          {[
-            { step: 1, title: 'Snap a Photo', desc: 'Point your camera at your meal from above.', icon: '📸' },
-            { step: 2, title: 'AI Analysis', desc: 'Our AI identifies ingredients & macros instantly.', icon: '🤖' },
-            { step: 3, title: 'Review & Adjust', desc: 'Fine-tune portions and nutrient data as needed.', icon: '✏️' },
-            { step: 4, title: 'Auto-Log', desc: 'Meal is logged to your nutrition tracker.', icon: '✅' },
-          ].map((item) => (
-            <div key={item.step}>
-              <div style={{ display: 'flex', gap: theme.spacing.md, marginBottom: theme.spacing.md, alignItems: 'flex-start' }}>
-                <div style={{
-                  minWidth: '50px',
-                  height: '50px',
-                  borderRadius: '50%',
-                  backgroundColor: theme.colors.primary,
-                  color: 'white',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 'bold',
-                  fontSize: '24px',
+            const data = await response.json();
+            setParsedMeal(data);
+        } catch (err) {
+            const errorMsg = err.message || 'Error parsing meal. Make sure backend is running at http://localhost:8000';
+            setError(errorMsg);
+            console.error('Parse meal error:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSaveMeal = async () => {
+        if (!parsedMeal) return;
+
+        setLoading(true);
+        setError(null);
+
+        try {
+            const mealData = {
+                food_label: mealDescription.substring(0, 50),
+                meal_description: mealDescription,
+                calories: parsedMeal.total_nutrition.calories,
+                protein: parsedMeal.total_nutrition.protein,
+                carbs: parsedMeal.total_nutrition.carbs,
+                fat: parsedMeal.total_nutrition.fat,
+                fiber: parsedMeal.total_nutrition.fiber || 0,
+                ingredients: parsedMeal.ingredients,
+            };
+
+            const response = await fetch(`${API_BASE_URL}/meals`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(mealData),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to save meal');
+            }
+
+            // Success
+            setMealDescription('');
+            setParsedMeal(null);
+            alert('Meal saved successfully!');
+        } catch (err) {
+            const errorMsg = err.message || 'Error saving meal. Make sure backend is running.';
+            setError(errorMsg);
+            console.error('Save meal error:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleReset = () => {
+        setMealDescription('');
+        setParsedMeal(null);
+        setError(null);
+    };
+
+    return (
+        <PageContainer>
+            <SectionHeader
+                title="Log Your Meal"
+                subtitle="Describe what you ate and we'll analyze the nutrition instantly."
+            />
+
+            {/* ===== DESCRIBE YOUR MEAL SECTION ===== */}
+            <div style={{ marginBottom: theme.spacing.xxl }}>
+                <AppCard style={{
+                    padding: theme.spacing.xl,
+                    background: `linear-gradient(135deg, ${theme.colors.secondary}10, ${theme.colors.primary}10)`,
+                    border: `2px solid ${theme.colors.secondary}`,
                 }}>
-                  {item.icon}
-                </div>
-                <div>
-                  <h4 style={{ ...theme.typography.body, fontWeight: 600, color: theme.colors.textPrimary, margin: 0, marginBottom: theme.spacing.xs }}>
-                    {item.title}
-                  </h4>
-                  <p style={{ ...theme.typography.body, color: theme.colors.textSecondary, margin: 0 }}>
-                    {item.desc}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </AppCard>
+                    <div style={{ marginBottom: theme.spacing.lg }}>
+                        <h2 style={{
+                            ...theme.typography.sectionHeading,
+                            color: theme.colors.textPrimary,
+                            marginBottom: theme.spacing.sm,
+                        }}>
+                            📝 Describe Your Meal
+                        </h2>
+                        <p style={{
+                            ...theme.typography.body,
+                            color: theme.colors.textSecondary,
+                            marginBottom: theme.spacing.lg,
+                        }}>
+                            Use natural language to describe what you ate. Be as specific or casual as you like!
+                        </p>
+                    </div>
 
-      {/* Recent Scans */}
-      <AppCard>
-        <SectionHeader title="Recent Scans" />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing.md }}>
-          {recentScans.map((scan, index) => (
-            <div
-              key={index}
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: theme.spacing.lg,
-                backgroundColor: theme.colors.background,
-                borderRadius: theme.borderRadius.lg,
-                cursor: 'pointer',
-                transition: 'all 200ms ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = theme.colors.border;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = theme.colors.background;
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing.lg, flex: 1 }}>
-                <div style={{ fontSize: '32px' }}>{scan.icon}</div>
-                <div>
-                  <h4 style={{ ...theme.typography.body, fontWeight: 600, color: theme.colors.textPrimary, margin: 0, marginBottom: theme.spacing.xs }}>
-                    {scan.name}
-                  </h4>
-                  <p style={{ ...theme.typography.small, color: theme.colors.textSecondary, margin: 0 }}>
-                    {scan.date}
-                  </p>
-                </div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing.md }}>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '60px',
-                  height: '60px',
-                  borderRadius: theme.borderRadius.lg,
-                  backgroundColor: theme.colors.secondary + '20',
-                  color: theme.colors.secondary,
-                  fontWeight: 'bold',
-                  fontSize: '14px',
-                }}>
-                  {scan.confidence}%
-                </div>
-                <span style={{ fontSize: '20px', color: theme.colors.textSecondary }}>→</span>
-              </div>
+                    <textarea
+                        value={mealDescription}
+                        onChange={(e) => setMealDescription(e.target.value)}
+                        placeholder="e.g. I ate 2 eggs, 1 toast with butter, 1 apple, and a cup of coffee with milk"
+                        style={{
+                            width: '100%',
+                            minHeight: '120px',
+                            padding: theme.spacing.md,
+                            border: `1px solid ${theme.colors.border}`,
+                            borderRadius: theme.borderRadius.md,
+                            fontSize: '14px',
+                            fontFamily: 'inherit',
+                            resize: 'vertical',
+                            outline: 'none',
+                            marginBottom: theme.spacing.lg,
+                        }}
+                    />
+
+                    {error && (
+                        <div style={{
+                            padding: theme.spacing.md,
+                            backgroundColor: '#FEE2E2',
+                            color: '#DC2626',
+                            borderRadius: theme.borderRadius.md,
+                            marginBottom: theme.spacing.lg,
+                            fontSize: '13px',
+                        }}>
+                            {error}
+                        </div>
+                    )}
+
+                    <div style={{ display: 'flex', gap: theme.spacing.md }}>
+                        <AppButton
+                            onClick={handleParseMeal}
+                            disabled={loading || !mealDescription.trim()}
+                            style={{ flex: 1 }}
+                        >
+                            {loading ? '⏳ Analyzing...' : '🔍 Analyze Meal'}
+                        </AppButton>
+                        <AppButton
+                            variant="secondary"
+                            onClick={handleReset}
+                            style={{ flex: 1 }}
+                        >
+                            Clear
+                        </AppButton>
+                    </div>
+                </AppCard>
             </div>
-          ))}
-        </div>
-      </AppCard>
-    </PageContainer>
-  );
+
+            {/* ===== PARSED MEAL RESULTS ===== */}
+            {parsedMeal && (
+                <div style={{ marginBottom: theme.spacing.xxl }}>
+                    <AppCard style={{
+                        background: `linear-gradient(135deg, ${theme.colors.secondary}10, ${theme.colors.primary}10)`,
+                        padding: theme.spacing.xl,
+                    }}>
+                        <div style={{ marginBottom: theme.spacing.lg }}>
+                            <h3 style={{
+                                ...theme.typography.sectionHeading,
+                                color: theme.colors.secondary,
+                                margin: 0,
+                            }}>
+                                ✅ Analysis Complete
+                            </h3>
+                        </div>
+
+                        {/* Ingredients Breakdown */}
+                        <div style={{ marginBottom: theme.spacing.xl }}>
+                            <h4 style={{
+                                ...theme.typography.body,
+                                fontWeight: 600,
+                                color: theme.colors.textPrimary,
+                                margin: 0,
+                                marginBottom: theme.spacing.md,
+                            }}>
+                                Ingredients Found:
+                            </h4>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing.md }}>
+                                {parsedMeal.ingredients.map((ing, idx) => (
+                                    <div
+                                        key={idx}
+                                        style={{
+                                            padding: theme.spacing.md,
+                                            backgroundColor: theme.colors.surface,
+                                            border: `1px solid ${theme.colors.border}`,
+                                            borderRadius: theme.borderRadius.md,
+                                        }}
+                                    >
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: theme.spacing.sm }}>
+                                            <h5 style={{
+                                                ...theme.typography.body,
+                                                fontWeight: 600,
+                                                color: theme.colors.textPrimary,
+                                                margin: 0,
+                                            }}>
+                                                {ing.ingredient_name.charAt(0).toUpperCase() + ing.ingredient_name.slice(1)}
+                                            </h5>
+                                            <span style={{
+                                                ...theme.typography.small,
+                                                fontWeight: 600,
+                                                color: theme.colors.primary,
+                                            }}>
+                                                {ing.quantity} {ing.unit}
+                                            </span>
+                                        </div>
+                                        <div style={{
+                                            display: 'grid',
+                                            gridTemplateColumns: 'repeat(4, 1fr)',
+                                            gap: theme.spacing.md,
+                                        }}>
+                                            <div style={{ textAlign: 'center', padding: theme.spacing.sm, backgroundColor: theme.colors.background, borderRadius: theme.borderRadius.sm }}>
+                                                <p style={{ ...theme.typography.small, color: theme.colors.textSecondary, margin: 0 }}>Cal</p>
+                                                <p style={{ ...theme.typography.body, fontWeight: 600, color: theme.colors.primary, margin: 0 }}>
+                                                    {ing.calories.toFixed(0)}
+                                                </p>
+                                            </div>
+                                            <div style={{ textAlign: 'center', padding: theme.spacing.sm, backgroundColor: theme.colors.background, borderRadius: theme.borderRadius.sm }}>
+                                                <p style={{ ...theme.typography.small, color: theme.colors.textSecondary, margin: 0 }}>Protein</p>
+                                                <p style={{ ...theme.typography.body, fontWeight: 600, color: theme.colors.secondary, margin: 0 }}>
+                                                    {ing.protein.toFixed(1)}g
+                                                </p>
+                                            </div>
+                                            <div style={{ textAlign: 'center', padding: theme.spacing.sm, backgroundColor: theme.colors.background, borderRadius: theme.borderRadius.sm }}>
+                                                <p style={{ ...theme.typography.small, color: theme.colors.textSecondary, margin: 0 }}>Carbs</p>
+                                                <p style={{ ...theme.typography.body, fontWeight: 600, color: '#F59E0B', margin: 0 }}>
+                                                    {ing.carbs.toFixed(1)}g
+                                                </p>
+                                            </div>
+                                            <div style={{ textAlign: 'center', padding: theme.spacing.sm, backgroundColor: theme.colors.background, borderRadius: theme.borderRadius.sm }}>
+                                                <p style={{ ...theme.typography.small, color: theme.colors.textSecondary, margin: 0 }}>Fat</p>
+                                                <p style={{ ...theme.typography.body, fontWeight: 600, color: '#3B82F6', margin: 0 }}>
+                                                    {ing.fat.toFixed(1)}g
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Total Nutrition */}
+                        <div style={{
+                            padding: theme.spacing.lg,
+                            backgroundColor: theme.colors.background,
+                            borderRadius: theme.borderRadius.lg,
+                            marginBottom: theme.spacing.lg,
+                        }}>
+                            <h4 style={{
+                                ...theme.typography.body,
+                                fontWeight: 600,
+                                color: theme.colors.textPrimary,
+                                margin: 0,
+                                marginBottom: theme.spacing.lg,
+                            }}>
+                                Total Nutrition:
+                            </h4>
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+                                gap: theme.spacing.md,
+                            }}>
+                                <div style={{ textAlign: 'center' }}>
+                                    <p style={{ ...theme.typography.small, color: theme.colors.textSecondary, margin: 0, marginBottom: theme.spacing.xs }}>
+                                        Calories
+                                    </p>
+                                    <p style={{ ...theme.typography.sectionHeading, color: theme.colors.primary, margin: 0 }}>
+                                        {parsedMeal.total_nutrition.calories.toFixed(0)}
+                                    </p>
+                                </div>
+                                <div style={{ textAlign: 'center' }}>
+                                    <p style={{ ...theme.typography.small, color: theme.colors.textSecondary, margin: 0, marginBottom: theme.spacing.xs }}>
+                                        Protein
+                                    </p>
+                                    <p style={{ ...theme.typography.sectionHeading, color: theme.colors.secondary, margin: 0 }}>
+                                        {parsedMeal.total_nutrition.protein.toFixed(1)}g
+                                    </p>
+                                </div>
+                                <div style={{ textAlign: 'center' }}>
+                                    <p style={{ ...theme.typography.small, color: theme.colors.textSecondary, margin: 0, marginBottom: theme.spacing.xs }}>
+                                        Carbs
+                                    </p>
+                                    <p style={{ ...theme.typography.sectionHeading, color: '#F59E0B', margin: 0 }}>
+                                        {parsedMeal.total_nutrition.carbs.toFixed(1)}g
+                                    </p>
+                                </div>
+                                <div style={{ textAlign: 'center' }}>
+                                    <p style={{ ...theme.typography.small, color: theme.colors.textSecondary, margin: 0, marginBottom: theme.spacing.xs }}>
+                                        Fat
+                                    </p>
+                                    <p style={{ ...theme.typography.sectionHeading, color: '#3B82F6', margin: 0 }}>
+                                        {parsedMeal.total_nutrition.fat.toFixed(1)}g
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div style={{ display: 'flex', gap: theme.spacing.md }}>
+                            <AppButton
+                                onClick={handleSaveMeal}
+                                disabled={loading}
+                                style={{ flex: 1 }}
+                            >
+                                {loading ? '💾 Saving...' : '✅ Save Meal'}
+                            </AppButton>
+                            <AppButton
+                                variant="secondary"
+                                onClick={() => setParsedMeal(null)}
+                                style={{ flex: 1 }}
+                            >
+                                🔄 Back to Input
+                            </AppButton>
+                        </div>
+                    </AppCard>
+                </div>
+            )}
+
+            {/* ===== DIVIDER ===== */}
+            {!parsedMeal && (
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: theme.spacing.lg,
+                    marginBottom: theme.spacing.xxl,
+                }}>
+                    <div style={{ flex: 1, height: '1px', backgroundColor: theme.colors.border }} />
+                    <span style={{ color: theme.colors.textSecondary, fontSize: '14px', fontWeight: 600 }}>
+                        OR
+                    </span>
+                    <div style={{ flex: 1, height: '1px', backgroundColor: theme.colors.border }} />
+                </div>
+            )}
+
+            {/* ===== AI PHOTO SCAN - COMING SOON ===== */}
+            <div style={{ marginBottom: theme.spacing.xxl }}>
+                <AppCard style={{
+                    padding: theme.spacing.xxl,
+                    textAlign: 'center',
+                    background: `linear-gradient(135deg, ${theme.colors.primary}08, ${theme.colors.secondary}08)`,
+                    opacity: 0.7,
+                    border: `2px dashed ${theme.colors.border}`,
+                }}>
+                    <div style={{ marginBottom: theme.spacing.lg }}>
+                        <div style={{
+                            fontSize: '80px',
+                            marginBottom: theme.spacing.md,
+                            opacity: 0.5,
+                        }}>
+                            📸
+                        </div>
+                        <h2 style={{
+                            ...theme.typography.sectionHeading,
+                            color: theme.colors.textPrimary,
+                            marginBottom: theme.spacing.sm,
+                        }}>
+                            AI Photo Scan
+                        </h2>
+                        <p style={{
+                            ...theme.typography.body,
+                            color: theme.colors.textSecondary,
+                            maxWidth: '500px',
+                            margin: `0 auto ${theme.spacing.lg}`,
+                        }}>
+                            Coming Soon – Take a photo of your meal and our AI will automatically identify ingredients and nutrition.
+                        </p>
+                        <div style={{
+                            display: 'inline-block',
+                            padding: `${theme.spacing.sm} ${theme.spacing.md}`,
+                            backgroundColor: theme.colors.primary + '20',
+                            color: theme.colors.primary,
+                            borderRadius: theme.borderRadius.md,
+                            fontSize: '12px',
+                            fontWeight: 600,
+                            marginTop: theme.spacing.md,
+                        }}>
+                            🔴 Coming Soon
+                        </div>
+                    </div>
+                </AppCard>
+            </div>
+
+            {/* ===== HOW IT WORKS ===== */}
+            <AppCard style={{ marginBottom: theme.spacing.xxl }}>
+                <SectionHeader title="How Text-Based Logging Works" />
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                    gap: theme.spacing.xl,
+                }}>
+                    {[
+                        { step: 1, title: 'Describe Your Meal', desc: 'Write what you ate naturally, as if telling a friend.', icon: '📝' },
+                        { step: 2, title: 'AI Parsing', desc: 'Our system analyzes text and extracts ingredients.', icon: '🧠' },
+                        { step: 3, title: 'Nutrition Lookup', desc: 'Each ingredient gets matched to nutrition data.', icon: '📊' },
+                        { step: 4, title: 'Auto-Log', desc: 'Save the meal and track it instantly.', icon: '✅' },
+                    ].map((item) => (
+                        <div key={item.step}>
+                            <div style={{ display: 'flex', gap: theme.spacing.md, marginBottom: theme.spacing.md, alignItems: 'flex-start' }}>
+                                <div style={{
+                                    minWidth: '50px',
+                                    height: '50px',
+                                    borderRadius: '50%',
+                                    backgroundColor: theme.colors.primary,
+                                    color: 'white',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontWeight: 'bold',
+                                    fontSize: '24px',
+                                }}>
+                                    {item.icon}
+                                </div>
+                                <div>
+                                    <h4 style={{ ...theme.typography.body, fontWeight: 600, color: theme.colors.textPrimary, margin: 0, marginBottom: theme.spacing.xs }}>
+                                        {item.title}
+                                    </h4>
+                                    <p style={{ ...theme.typography.body, color: theme.colors.textSecondary, margin: 0 }}>
+                                        {item.desc}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </AppCard>
+
+            {/* ===== EXAMPLE INPUTS ===== */}
+            <AppCard>
+                <SectionHeader
+                    title="Example Inputs"
+                    subtitle="Try describing your meals like this"
+                />
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: theme.spacing.lg }}>
+                    {[
+                        'I ate 2 eggs, 1 toast with butter, and coffee with milk',
+                        '4 egg whites, 1 cup noodles with olives and mushrooms, 1 spoon honey',
+                        'Grilled chicken breast, 1.5 cups rice, broccoli, and 1 tbsp olive oil',
+                        'Tuna sandwich with lettuce, 1 apple, and almonds',
+                    ].map((example, idx) => (
+                        <div
+                            key={idx}
+                            style={{
+                                padding: theme.spacing.lg,
+                                backgroundColor: theme.colors.background,
+                                borderRadius: theme.borderRadius.lg,
+                                border: `1px solid ${theme.colors.border}`,
+                                cursor: 'pointer',
+                                transition: 'all 200ms ease',
+                            }}
+                            onClick={() => setMealDescription(example)}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = theme.colors.primary + '10';
+                                e.currentTarget.style.borderColor = theme.colors.primary;
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = theme.colors.background;
+                                e.currentTarget.style.borderColor = theme.colors.border;
+                            }}
+                        >
+                            <p style={{
+                                ...theme.typography.small,
+                                color: theme.colors.textSecondary,
+                                margin: 0,
+                                fontStyle: 'italic',
+                            }}>
+                                {example}
+                            </p>
+                        </div>
+                    ))}
+                </div>
+            </AppCard>
+        </PageContainer>
+    );
 };
 
 export default MealScanner;
