@@ -14,6 +14,8 @@ class IngredientNutrition(BaseModel):
     carbs: float
     fat: float
     fiber: float
+    confidence: str
+    warning: str = ""
 
 
 class ParseMealRequest(BaseModel):
@@ -27,6 +29,8 @@ class ParseMealResponse(BaseModel):
 
     ingredients: List[IngredientNutrition]
     total_nutrition: dict  # {calories, protein, carbs, fat, fiber}
+    confidence: str
+    warning: str = ""
 
 
 class MealIngredientResponse(BaseModel):

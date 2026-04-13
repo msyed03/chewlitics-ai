@@ -107,6 +107,8 @@ const NutritionAnalytics = () => {
       { day: 'Sun', calories: 1900, target: 2200 },
     ];
 
+  const formatMacroValue = (value) => parseFloat(value.toFixed(2)).toString();
+
   return (
     <PageContainer>
       <SectionHeader
@@ -150,7 +152,7 @@ const NutritionAnalytics = () => {
                     </span>
                   </div>
                   <span style={{ ...theme.typography.body, fontWeight: 600, color: theme.colors.textPrimary }}>
-                    {macro.current}{macro.unit} / {macro.target}{macro.unit}
+                    {formatMacroValue(macro.current)}{macro.unit} / {formatMacroValue(macro.target)}{macro.unit}
                   </span>
                 </div>
                 <div style={{ width: '100%', height: '12px', backgroundColor: theme.colors.border, borderRadius: '6px', overflow: 'hidden', marginBottom: theme.spacing.sm }}>
@@ -169,7 +171,7 @@ const NutritionAnalytics = () => {
                     {Math.round((macro.current / macro.target) * 100)}% complete
                   </span>
                   <span style={{ ...theme.typography.small, color: macro.current < macro.target ? theme.colors.danger : theme.colors.secondary }}>
-                    {Math.abs(macro.current - macro.target)}{macro.unit} {macro.current < macro.target ? 'to go' : 'over'}
+                    {formatMacroValue(Math.abs(macro.current - macro.target))}{macro.unit} {macro.current < macro.target ? 'to go' : 'over'}
                   </span>
                 </div>
               </div>

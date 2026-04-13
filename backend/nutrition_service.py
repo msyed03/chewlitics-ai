@@ -4,12 +4,31 @@ Nutrition Service: Fetches nutrition data from USDA FoodData Central API.
 
 import requests
 import os
-from typing import Dict, Optional, List
+import json
+from typing import Dict, Optional, List, Tuple
 from dataclasses import dataclass
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 USDA_API_KEY = os.getenv("USDA_API_KEY", "DEMO_KEY")
+if USDA_API_KEY == "DEMO_KEY":
+    print(
+        "Warning: Using DEMO_KEY for USDA API. Get a real key for higher rate limits."
+    )
 USDA_API_URL = "https://fdc.nal.usda.gov/api/foods/search"
+
+
+CORE_FOODS_PATH = os.path.join(os.path.dirname(__file__), "data", "core_foods.json")
+CORE_FOODS = {}
+try:
+    with open(CORE_FOODS_PATH, "r") as f:
+        CORE_FOODS = json.load(f)
+except FileNotFoundError:
+    print("Warning: core_foods.json not found")
+except json.JSONDecodeError:
+    print("Warning: core_foods.json invalid")
 
 
 @dataclass
@@ -115,6 +134,12 @@ LOCAL_NUTRITION_DB = {
     },
     "cereal": {"calories": 380, "protein": 7, "carbs": 85, "fat": 2, "fiber": 3},
     "granola": {"calories": 471, "protein": 11, "carbs": 61, "fat": 20, "fiber": 7},
+    "apple": {"calories": 52, "protein": 0.3, "carbs": 14, "fat": 0.2, "fiber": 2.4},
+    "banana": {"calories": 89, "protein": 1.1, "carbs": 23, "fat": 0.3, "fiber": 2.6},
+    "coffee": {"calories": 1, "protein": 0.1, "carbs": 0, "fat": 0, "fiber": 0},
+    "cookies": {"calories": 50, "protein": 1, "carbs": 7, "fat": 2, "fiber": 0.3},
+    "lettuce": {"calories": 5, "protein": 0.5, "carbs": 1, "fat": 0, "fiber": 0.5},
+    # Add hundreds more for fruits, veggies, meats, etc.
 }
 
 
@@ -124,28 +149,49 @@ class NutritionService:
     @staticmethod
     def get_nutrition(
         ingredient_name: str, quantity: float = 1.0, unit: str = "unit"
-    ) -> Optional[NutritionData]:
+    ) -> Tuple[Optional[NutritionData], str, str]:
         """
         Fetch nutrition data for an ingredient.
-        First tries USDA API, falls back to local database.
+        Returns (nutrition, confidence, warning)
         """
         # Normalize quantity to grams for calculations (simplified)
         quantity_grams = NutritionService._convert_to_grams(
             quantity, unit, ingredient_name
         )
 
-        # Try USDA API first
+        # Try local curated dataset first
+        if ingredient_name in CORE_FOODS:
+            food_data = CORE_FOODS[ingredient_name]
+            portion_weights = food_data["portion_weights"]
+            default_unit = food_data["default_unit"]
+            if unit in portion_weights:
+                grams = quantity * portion_weights[unit]
+            else:
+                grams = quantity * portion_weights.get(default_unit, 100)
+            nutrition_per_100g = food_data["nutrition_per_100g"]
+            scale = grams / 100
+            nutrition = NutritionData(
+                calories=nutrition_per_100g["calories"] * scale,
+                protein=nutrition_per_100g["protein"] * scale,
+                carbs=nutrition_per_100g["carbs"] * scale,
+                fat=nutrition_per_100g["fat"] * scale,
+                fiber=nutrition_per_100g.get("fiber", 0) * scale,
+            )
+            return nutrition, "high", ""
+
+        # Try USDA API
         nutrition = NutritionService._fetch_from_usda(ingredient_name)
+        if nutrition:
+            scaled = NutritionService._scale_nutrition(nutrition, quantity_grams)
+            return scaled, "medium", ""
 
         # Fallback to local database
-        if not nutrition:
-            nutrition = NutritionService._fetch_from_local_db(ingredient_name)
-
+        nutrition = NutritionService._fetch_from_local_db(ingredient_name)
         if nutrition:
-            # Scale by quantity
-            return NutritionService._scale_nutrition(nutrition, quantity_grams)
+            scaled = NutritionService._scale_nutrition(nutrition, quantity_grams)
+            return scaled, "low", "Estimated using generic serving assumptions"
 
-        return None
+        return None, "low", "No nutrition data found"
 
     @staticmethod
     def _convert_to_grams(quantity: float, unit: str, ingredient_name: str) -> float:
@@ -236,6 +282,6 @@ class NutritionService:
 
 def get_nutrition(
     ingredient_name: str, quantity: float = 1.0, unit: str = "unit"
-) -> Optional[NutritionData]:
+) -> Tuple[Optional[NutritionData], str, str]:
     """Convenience function to get nutrition data."""
     return NutritionService.get_nutrition(ingredient_name, quantity, unit)

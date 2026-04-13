@@ -16,6 +16,8 @@ const MealHistory = () => {
     const [editingMeal, setEditingMeal] = useState(null);
     const [editForm, setEditForm] = useState({ description: '', mealType: '' });
 
+    const parseTimestamp = (timestamp) => new Date(timestamp.endsWith('Z') ? timestamp : `${timestamp}Z`);
+
     useEffect(() => {
         fetchMeals();
     }, []);
@@ -81,7 +83,7 @@ const MealHistory = () => {
 
     // Group meals by date
     const groupedMeals = meals.reduce((groups, meal) => {
-        const date = new Date(meal.timestamp).toLocaleDateString();
+        const date = parseTimestamp(meal.timestamp).toLocaleDateString();
         if (!groups[date]) groups[date] = [];
         groups[date].push(meal);
         return groups;
@@ -209,7 +211,7 @@ const MealHistory = () => {
                                             </h4>
                                             <div style={{ display: 'flex', gap: theme.spacing.lg, flexWrap: 'wrap', marginBottom: theme.spacing.md }}>
                                                 <span style={{ ...theme.typography.small, color: theme.colors.textSecondary }}>
-                                                    ⏰ {new Date(meal.timestamp + 'Z').toLocaleTimeString()}
+                                                    ⏰ {parseTimestamp(meal.timestamp).toLocaleTimeString()}
                                                 </span>
                                                 <span style={{
                                                     ...theme.typography.small,
@@ -283,7 +285,7 @@ const MealHistory = () => {
                             Avg. Daily Calories
                         </p>
                         <p style={{ ...theme.typography.heroHeading, color: theme.colors.secondary, margin: 0 }}>
-                            {meals.length > 0 ? Math.round(meals.reduce((sum, m) => sum + m.calories, 0) / Math.max(1, new Set(meals.map(m => new Date(m.timestamp).toDateString())).size)) : 0}
+                            {meals.length > 0 ? Math.round(meals.reduce((sum, m) => sum + m.calories, 0) / Math.max(1, new Set(meals.map(m => parseTimestamp(m.timestamp).toDateString())).size)) : 0}
                         </p>
                     </div>
                     <div style={{ textAlign: 'center', padding: theme.spacing.lg, backgroundColor: theme.colors.background, borderRadius: theme.borderRadius.lg }}>
@@ -291,7 +293,7 @@ const MealHistory = () => {
                             Total Days Logged
                         </p>
                         <p style={{ ...theme.typography.heroHeading, color: '#F59E0B', margin: 0 }}>
-                            {new Set(meals.map(m => new Date(m.timestamp).toDateString())).size}
+                            {new Set(meals.map(m => parseTimestamp(m.timestamp).toDateString())).size}
                         </p>
                     </div>
                 </div>

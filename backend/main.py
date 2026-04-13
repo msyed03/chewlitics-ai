@@ -66,7 +66,9 @@ def parse_meal_endpoint(request: schemas.ParseMealRequest):
 
     # Get nutrition for each ingredient
     for ingredient in parsed_ingredients:
-        nutrition = get_nutrition(ingredient.name, ingredient.quantity, ingredient.unit)
+        nutrition, conf, warn = get_nutrition(
+            ingredient.name, ingredient.quantity, ingredient.unit
+        )
 
         if nutrition:
             ingredients_nutrition.append(
@@ -79,6 +81,8 @@ def parse_meal_endpoint(request: schemas.ParseMealRequest):
                     carbs=round(nutrition.carbs, 2),
                     fat=round(nutrition.fat, 2),
                     fiber=round(nutrition.fiber, 2),
+                    confidence=conf,
+                    warning=warn,
                 )
             )
 
@@ -87,6 +91,20 @@ def parse_meal_endpoint(request: schemas.ParseMealRequest):
             total_carbs += nutrition.carbs
             total_fat += nutrition.fat
             total_fiber += nutrition.fiber
+
+    # Determine overall confidence
+    if not ingredients_nutrition:
+        overall_confidence = "low"
+        warning = "No ingredients parsed"
+    elif all(i.confidence == "high" for i in ingredients_nutrition):
+        overall_confidence = "high"
+        warning = ""
+    elif any(i.confidence in ["medium", "high"] for i in ingredients_nutrition):
+        overall_confidence = "medium"
+        warning = "Some ingredients used estimated values"
+    else:
+        overall_confidence = "low"
+        warning = "Estimated using generic serving assumptions"
 
     return schemas.ParseMealResponse(
         ingredients=ingredients_nutrition,
@@ -97,6 +115,8 @@ def parse_meal_endpoint(request: schemas.ParseMealRequest):
             "fat": round(total_fat, 2),
             "fiber": round(total_fiber, 2),
         },
+        confidence=overall_confidence,
+        warning=warning,
     )
 
 
@@ -165,7 +185,9 @@ def delete_meal(meal_id: int, db: Session = Depends(get_db)):
 
 
 @app.put("/meals/{meal_id}", response_model=schemas.MealResponse)
-def update_meal(meal_id: int, meal_update: schemas.MealUpdate, db: Session = Depends(get_db)):
+def update_meal(
+    meal_id: int, meal_update: schemas.MealUpdate, db: Session = Depends(get_db)
+):
     """
     Update a meal by ID.
     """
@@ -174,7 +196,7 @@ def update_meal(meal_id: int, meal_update: schemas.MealUpdate, db: Session = Dep
         raise HTTPException(status_code=404, detail="Meal not found")
 
     # Re-parse description when it changes and update nutrition data.
-    if 'original_description' in meal_update.__fields_set__:
+    if "original_description" in meal_update.__fields_set__:
         if meal_update.original_description is not None:
             meal.original_description = meal_update.original_description
 
@@ -187,7 +209,9 @@ def update_meal(meal_id: int, meal_update: schemas.MealUpdate, db: Session = Dep
             total_fiber = 0
 
             for ingredient in parsed_ingredients:
-                nutrition = get_nutrition(ingredient.name, ingredient.quantity, ingredient.unit)
+                nutrition, conf, warn = get_nutrition(
+                    ingredient.name, ingredient.quantity, ingredient.unit
+                )
                 if not nutrition:
                     continue
                 ingredients_nutrition.append(
@@ -200,6 +224,8 @@ def update_meal(meal_id: int, meal_update: schemas.MealUpdate, db: Session = Dep
                         carbs=round(nutrition.carbs, 2),
                         fat=round(nutrition.fat, 2),
                         fiber=round(nutrition.fiber, 2),
+                        confidence=conf,
+                        warning=warn,
                     )
                 )
                 total_calories += nutrition.calories
@@ -208,7 +234,9 @@ def update_meal(meal_id: int, meal_update: schemas.MealUpdate, db: Session = Dep
                 total_fat += nutrition.fat
                 total_fiber += nutrition.fiber
 
-            meal.parsed_ingredients = json.dumps([ing.dict() for ing in ingredients_nutrition])
+            meal.parsed_ingredients = json.dumps(
+                [ing.dict() for ing in ingredients_nutrition]
+            )
             meal.calories = round(total_calories, 2)
             meal.protein = round(total_protein, 2)
             meal.carbs = round(total_carbs, 2)
@@ -231,7 +259,7 @@ def update_meal(meal_id: int, meal_update: schemas.MealUpdate, db: Session = Dep
                 )
                 meal.ingredients.append(db_ingredient)
 
-    if 'meal_type' in meal_update.__fields_set__:
+    if "meal_type" in meal_update.__fields_set__:
         meal.meal_type = meal_update.meal_type
 
     db.commit()
@@ -248,7 +276,6 @@ def get_daily_analytics(db: Session = Depends(get_db)):
     Get today's nutrition totals and meal list.
     """
     today = datetime.utcnow().date()
-    tomorrow = today + timedelta(days=1)
 
     # Get meals for today
     meals = (
@@ -303,30 +330,40 @@ def get_weekly_analytics(db: Session = Depends(get_db)):
         day = meal.timestamp.date()
         if day not in daily_totals:
             daily_totals[day] = {
-                'calories': 0,
-                'protein': 0,
-                'carbs': 0,
-                'fat': 0,
-                'fiber': 0,
-                'meals_count': 0,
+                "calories": 0,
+                "protein": 0,
+                "carbs": 0,
+                "fat": 0,
+                "fiber": 0,
+                "meals_count": 0,
             }
-        daily_totals[day]['calories'] += meal.calories
-        daily_totals[day]['protein'] += meal.protein
-        daily_totals[day]['carbs'] += meal.carbs
-        daily_totals[day]['fat'] += meal.fat
-        daily_totals[day]['fiber'] += meal.fiber
-        daily_totals[day]['meals_count'] += 1
+        daily_totals[day]["calories"] += meal.calories
+        daily_totals[day]["protein"] += meal.protein
+        daily_totals[day]["carbs"] += meal.carbs
+        daily_totals[day]["fat"] += meal.fat
+        daily_totals[day]["fiber"] += meal.fiber
+        daily_totals[day]["meals_count"] += 1
 
     # Calculate weekly averages
     total_days = (today - week_start).days + 1
     weekly_summary = schemas.WeeklyNutritionSummary(
         week_start=str(week_start),
         week_end=str(today),
-        avg_daily_calories=round(sum(d['calories'] for d in daily_totals.values()) / total_days, 2),
-        avg_daily_protein=round(sum(d['protein'] for d in daily_totals.values()) / total_days, 2),
-        avg_daily_carbs=round(sum(d['carbs'] for d in daily_totals.values()) / total_days, 2),
-        avg_daily_fat=round(sum(d['fat'] for d in daily_totals.values()) / total_days, 2),
-        avg_daily_fiber=round(sum(d['fiber'] for d in daily_totals.values()) / total_days, 2),
+        avg_daily_calories=round(
+            sum(d["calories"] for d in daily_totals.values()) / total_days, 2
+        ),
+        avg_daily_protein=round(
+            sum(d["protein"] for d in daily_totals.values()) / total_days, 2
+        ),
+        avg_daily_carbs=round(
+            sum(d["carbs"] for d in daily_totals.values()) / total_days, 2
+        ),
+        avg_daily_fat=round(
+            sum(d["fat"] for d in daily_totals.values()) / total_days, 2
+        ),
+        avg_daily_fiber=round(
+            sum(d["fiber"] for d in daily_totals.values()) / total_days, 2
+        ),
         total_meals_logged=len(meals),
         days_logged=len(daily_totals),
     )
@@ -335,12 +372,12 @@ def get_weekly_analytics(db: Session = Depends(get_db)):
     daily_breakdown = [
         schemas.DailyNutritionSummary(
             date=str(day),
-            total_calories=round(daily_totals[day]['calories'], 2),
-            total_protein=round(daily_totals[day]['protein'], 2),
-            total_carbs=round(daily_totals[day]['carbs'], 2),
-            total_fat=round(daily_totals[day]['fat'], 2),
-            total_fiber=round(daily_totals[day]['fiber'], 2),
-            meals_logged=daily_totals[day]['meals_count'],
+            total_calories=round(daily_totals[day]["calories"], 2),
+            total_protein=round(daily_totals[day]["protein"], 2),
+            total_carbs=round(daily_totals[day]["carbs"], 2),
+            total_fat=round(daily_totals[day]["fat"], 2),
+            total_fiber=round(daily_totals[day]["fiber"], 2),
+            meals_logged=daily_totals[day]["meals_count"],
         )
         for day in sorted(daily_totals.keys())
     ]
