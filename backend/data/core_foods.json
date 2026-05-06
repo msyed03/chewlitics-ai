@@ -91,9 +91,9 @@
         }
     },
     "bread": {
-        "default_unit": "unit",
+        "default_unit": "slice",
         "portion_weights": {
-            "unit": 100,
+            "unit": 45,
             "slice": 45
         },
         "nutrition_per_100g": {
@@ -440,6 +440,182 @@
             "carbs": 0,
             "fat": 0,
             "fiber": 0
+        }
+    },
+    "egg white": {
+        "default_unit": "piece",
+        "portion_weights": {
+            "piece": 33,
+            "unit": 33
+        },
+        "nutrition_per_100g": {
+            "calories": 52,
+            "protein": 10.9,
+            "carbs": 0.7,
+            "fat": 0.2,
+            "fiber": 0
+        }
+    },
+    "pizza": {
+        "default_unit": "slice",
+        "portion_weights": {
+            "slice": 107,
+            "piece": 107,
+            "unit": 107
+        },
+        "nutrition_per_100g": {
+            "calories": 266,
+            "protein": 11,
+            "carbs": 33,
+            "fat": 10,
+            "fiber": 2.3
+        }
+    },
+    "burrito": {
+        "default_unit": "unit",
+        "portion_weights": {
+            "unit": 300,
+            "piece": 300
+        },
+        "nutrition_per_100g": {
+            "calories": 206,
+            "protein": 8,
+            "carbs": 28,
+            "fat": 7,
+            "fiber": 4
+        }
+    },
+    "tortilla": {
+        "default_unit": "piece",
+        "portion_weights": {
+            "piece": 49,
+            "unit": 49
+        },
+        "nutrition_per_100g": {
+            "calories": 297,
+            "protein": 8,
+            "carbs": 49,
+            "fat": 8,
+            "fiber": 3
+        }
+    },
+    "burger": {
+        "default_unit": "unit",
+        "portion_weights": {
+            "unit": 240,
+            "piece": 240
+        },
+        "nutrition_per_100g": {
+            "calories": 250,
+            "protein": 13,
+            "carbs": 24,
+            "fat": 12,
+            "fiber": 1.5
+        }
+    },
+    "guacamole": {
+        "default_unit": "tbsp",
+        "portion_weights": {
+            "tbsp": 15,
+            "cup": 230,
+            "unit": 30
+        },
+        "nutrition_per_100g": {
+            "calories": 160,
+            "protein": 2,
+            "carbs": 9,
+            "fat": 15,
+            "fiber": 6.7
+        }
+    },
+    "salsa": {
+        "default_unit": "tbsp",
+        "portion_weights": {
+            "tbsp": 16,
+            "cup": 260,
+            "unit": 30
+        },
+        "nutrition_per_100g": {
+            "calories": 36,
+            "protein": 1.5,
+            "carbs": 7,
+            "fat": 0.2,
+            "fiber": 1.5
+        }
+    },
+    "sour cream": {
+        "default_unit": "tbsp",
+        "portion_weights": {
+            "tbsp": 12,
+            "cup": 230,
+            "unit": 30
+        },
+        "nutrition_per_100g": {
+            "calories": 193,
+            "protein": 2.4,
+            "carbs": 4.6,
+            "fat": 19,
+            "fiber": 0
+        }
+    },
+    "fries": {
+        "default_unit": "serving",
+        "portion_weights": {
+            "serving": 117,
+            "unit": 117,
+            "cup": 96
+        },
+        "nutrition_per_100g": {
+            "calories": 312,
+            "protein": 3.4,
+            "carbs": 41,
+            "fat": 15,
+            "fiber": 3.8
+        }
+    },
+    "protein shake": {
+        "default_unit": "serving",
+        "portion_weights": {
+            "serving": 330,
+            "unit": 330,
+            "cup": 240
+        },
+        "nutrition_per_100g": {
+            "calories": 45,
+            "protein": 9,
+            "carbs": 3,
+            "fat": 0.8,
+            "fiber": 0.3
+        }
+    },
+    "soda": {
+        "default_unit": "can",
+        "portion_weights": {
+            "can": 355,
+            "cup": 240,
+            "bottle": 591,
+            "unit": 355
+        },
+        "nutrition_per_100g": {
+            "calories": 41,
+            "protein": 0,
+            "carbs": 10.6,
+            "fat": 0,
+            "fiber": 0
+        }
+    },
+    "lettuce": {
+        "default_unit": "cup",
+        "portion_weights": {
+            "cup": 36,
+            "unit": 36
+        },
+        "nutrition_per_100g": {
+            "calories": 15,
+            "protein": 1.4,
+            "carbs": 2.9,
+            "fat": 0.2,
+            "fiber": 1.3
         }
     }
 }

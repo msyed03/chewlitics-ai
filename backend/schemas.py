@@ -33,6 +33,27 @@ class ParseMealResponse(BaseModel):
     warning: str = ""
 
 
+
+
+class ImageScanPrediction(BaseModel):
+    """Single food-image prediction option."""
+
+    label: str
+    score: float
+
+
+class ImageScanResponse(BaseModel):
+    """Response from image-based meal scanning."""
+
+    detected_label: str
+    confidence_score: float
+    source: str
+    generated_description: str
+    parse_result: ParseMealResponse
+    warning: str = ""
+    top_predictions: List[ImageScanPrediction] = []
+
+
 class MealIngredientResponse(BaseModel):
     """Individual ingredient in a meal."""
 

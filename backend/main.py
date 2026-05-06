@@ -1,6 +1,6 @@
 import json
 
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -10,6 +10,7 @@ import models
 import schemas
 from meal_parser import parse_meal
 from nutrition_service import get_nutrition
+from vision_service import scan_food_image
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -42,19 +43,8 @@ def root():
 # ==================== Nutrition Parsing ====================
 
 
-@app.post("/nutrition/parse-meal", response_model=schemas.ParseMealResponse)
-def parse_meal_endpoint(request: schemas.ParseMealRequest):
-    """
-    Parse natural language meal description into structured ingredients + nutrition.
-
-    Example:
-        {
-            "meal_description": "I ate 4 egg whites, 1 cup noodles with olives and mushrooms, and 1 spoon honey"
-        }
-    """
-    description = request.meal_description
-
-    # Parse ingredients from description
+def build_parse_meal_response(description: str) -> schemas.ParseMealResponse:
+    """Shared parser + nutrition lookup used by text logging and image scanning."""
     parsed_ingredients = parse_meal(description)
 
     ingredients_nutrition = []
@@ -64,7 +54,6 @@ def parse_meal_endpoint(request: schemas.ParseMealRequest):
     total_fat = 0
     total_fiber = 0
 
-    # Get nutrition for each ingredient
     for ingredient in parsed_ingredients:
         nutrition, conf, warn = get_nutrition(
             ingredient.name, ingredient.quantity, ingredient.unit
@@ -92,7 +81,6 @@ def parse_meal_endpoint(request: schemas.ParseMealRequest):
             total_fat += nutrition.fat
             total_fiber += nutrition.fiber
 
-    # Determine overall confidence
     if not ingredients_nutrition:
         overall_confidence = "low"
         warning = "No ingredients parsed"
@@ -117,6 +105,53 @@ def parse_meal_endpoint(request: schemas.ParseMealRequest):
         },
         confidence=overall_confidence,
         warning=warning,
+    )
+
+
+@app.post("/nutrition/parse-meal", response_model=schemas.ParseMealResponse)
+def parse_meal_endpoint(request: schemas.ParseMealRequest):
+    """
+    Parse natural language meal description into structured ingredients + nutrition.
+
+    Example:
+        {
+            "meal_description": "I ate 4 egg whites, 1 cup noodles with olives and mushrooms, and 1 spoon honey"
+        }
+    """
+    return build_parse_meal_response(request.meal_description)
+
+
+@app.post("/vision/scan-meal", response_model=schemas.ImageScanResponse)
+async def scan_meal_image_endpoint(file: UploadFile = File(...)):
+    """
+    Upload a food image, identify the most likely food, convert it into a text meal
+    description, then reuse the same NLP + nutrition pipeline.
+    """
+    if file.content_type and not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="Please upload an image file")
+
+    image_bytes = await file.read()
+    if not image_bytes:
+        raise HTTPException(status_code=400, detail="Uploaded image was empty")
+
+    vision_result = scan_food_image(
+        image_bytes=image_bytes,
+        filename=file.filename or "",
+        content_type=file.content_type or "image/jpeg",
+    )
+    parse_result = build_parse_meal_response(vision_result.generated_description)
+
+    return schemas.ImageScanResponse(
+        detected_label=vision_result.label,
+        confidence_score=round(vision_result.confidence_score, 4),
+        source=vision_result.source,
+        generated_description=vision_result.generated_description,
+        parse_result=parse_result,
+        warning=vision_result.warning,
+        top_predictions=[
+            schemas.ImageScanPrediction(label=p.label, score=round(p.score, 4))
+            for p in vision_result.top_predictions
+        ],
     )
 
 
