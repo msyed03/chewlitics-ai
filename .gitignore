@@ -42,3 +42,6 @@ yarn-error.log*
 .idea/
 *.swp
 *.swo
+
+# Runtime nutrition lookup cache
+backend/data/usda_nutrition_cache.json

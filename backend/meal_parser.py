@@ -173,6 +173,28 @@ INGREDIENT_ALIASES = {
     "cola": "soda",
     "cookie": "cookies",
     "cookies": "cookies",
+    # full dishes / image-recognition labels
+    "pad thai": "pad thai",
+    "tiramisu": "tiramisu",
+    "cheesecake": "cheesecake",
+    "cake": "cake",
+    "apple pie": "apple pie",
+    "pancakes": "pancakes",
+    "pancake": "pancakes",
+    "waffles": "waffles",
+    "waffle": "waffles",
+    "ramen": "ramen",
+    "pho": "pho",
+    "sushi": "sushi",
+    "tacos": "tacos",
+    "taco": "tacos",
+    "hot dog": "hot dog",
+    "chicken wings": "chicken wings",
+    "ice cream": "ice cream",
+    "donut": "donut",
+    "donuts": "donut",
+    "dumplings": "dumplings",
+    "nachos": "nachos",
 }
 
 
