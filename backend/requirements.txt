@@ -3,3 +3,5 @@ uvicorn
 sqlalchemy
 requests
 python-dotenv
+python-multipart
+huggingface_hub

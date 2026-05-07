@@ -1,445 +1,883 @@
 {
-    "egg": {
-        "default_unit": "piece",
-        "portion_weights": {
-            "piece": 50
-        },
-        "nutrition_per_100g": {
-            "calories": 143,
-            "protein": 13,
-            "carbs": 1.1,
-            "fat": 10,
-            "fiber": 0
-        }
+  "egg": {
+    "default_unit": "piece",
+    "portion_weights": {
+      "piece": 50
     },
-    "chicken breast": {
-        "default_unit": "piece",
-        "portion_weights": {
-            "piece": 150
-        },
-        "nutrition_per_100g": {
-            "calories": 165,
-            "protein": 31,
-            "carbs": 0,
-            "fat": 3.6,
-            "fiber": 0
-        }
-    },
-    "beef": {
-        "default_unit": "oz",
-        "portion_weights": {
-            "oz": 28
-        },
-        "nutrition_per_100g": {
-            "calories": 250,
-            "protein": 26,
-            "carbs": 0,
-            "fat": 15,
-            "fiber": 0
-        }
-    },
-    "salmon": {
-        "default_unit": "piece",
-        "portion_weights": {
-            "piece": 150
-        },
-        "nutrition_per_100g": {
-            "calories": 206,
-            "protein": 22,
-            "carbs": 0,
-            "fat": 13,
-            "fiber": 0
-        }
-    },
-    "tuna": {
-        "default_unit": "oz",
-        "portion_weights": {
-            "oz": 28
-        },
-        "nutrition_per_100g": {
-            "calories": 144,
-            "protein": 30,
-            "carbs": 0,
-            "fat": 1.3,
-            "fiber": 0
-        }
-    },
-    "rice": {
-        "default_unit": "cup",
-        "portion_weights": {
-            "cup": 185
-        },
-        "nutrition_per_100g": {
-            "calories": 130,
-            "protein": 2.7,
-            "carbs": 28,
-            "fat": 0.3,
-            "fiber": 0.4
-        }
-    },
-    "pasta": {
-        "default_unit": "cup",
-        "portion_weights": {
-            "cup": 140
-        },
-        "nutrition_per_100g": {
-            "calories": 157,
-            "protein": 5.8,
-            "carbs": 31,
-            "fat": 0.9,
-            "fiber": 1.8
-        }
-    },
-    "bread": {
-        "default_unit": "unit",
-        "portion_weights": {
-            "unit": 100,
-            "slice": 45
-        },
-        "nutrition_per_100g": {
-            "calories": 265,
-            "protein": 9,
-            "carbs": 49,
-            "fat": 3.2,
-            "fiber": 2.7
-        }
-    },
-    "milk": {
-        "default_unit": "cup",
-        "portion_weights": {
-            "cup": 244
-        },
-        "nutrition_per_100g": {
-            "calories": 61,
-            "protein": 3.2,
-            "carbs": 4.8,
-            "fat": 3.3,
-            "fiber": 0
-        }
-    },
-    "cheese": {
-        "default_unit": "oz",
-        "portion_weights": {
-            "oz": 28
-        },
-        "nutrition_per_100g": {
-            "calories": 402,
-            "protein": 7,
-            "carbs": 0.7,
-            "fat": 33,
-            "fiber": 0
-        }
-    },
-    "yogurt": {
-        "default_unit": "cup",
-        "portion_weights": {
-            "cup": 245
-        },
-        "nutrition_per_100g": {
-            "calories": 59,
-            "protein": 10,
-            "carbs": 3.3,
-            "fat": 0.4,
-            "fiber": 0
-        }
-    },
-    "banana": {
-        "default_unit": "piece",
-        "portion_weights": {
-            "piece": 118
-        },
-        "nutrition_per_100g": {
-            "calories": 89,
-            "protein": 1.1,
-            "carbs": 23,
-            "fat": 0.3,
-            "fiber": 2.6
-        }
-    },
-    "apple": {
-        "default_unit": "piece",
-        "portion_weights": {
-            "piece": 182
-        },
-        "nutrition_per_100g": {
-            "calories": 52,
-            "protein": 0.3,
-            "carbs": 14,
-            "fat": 0.2,
-            "fiber": 2.4
-        }
-    },
-    "potato": {
-        "default_unit": "piece",
-        "portion_weights": {
-            "piece": 173
-        },
-        "nutrition_per_100g": {
-            "calories": 77,
-            "protein": 2,
-            "carbs": 17,
-            "fat": 0.1,
-            "fiber": 2.2
-        }
-    },
-    "broccoli": {
-        "default_unit": "cup",
-        "portion_weights": {
-            "cup": 91
-        },
-        "nutrition_per_100g": {
-            "calories": 34,
-            "protein": 2.8,
-            "carbs": 7,
-            "fat": 0.4,
-            "fiber": 2.4
-        }
-    },
-    "carrots": {
-        "default_unit": "cup",
-        "portion_weights": {
-            "cup": 128
-        },
-        "nutrition_per_100g": {
-            "calories": 41,
-            "protein": 0.9,
-            "carbs": 10,
-            "fat": 0.2,
-            "fiber": 2.8
-        }
-    },
-    "mushrooms": {
-        "default_unit": "cup",
-        "portion_weights": {
-            "cup": 70
-        },
-        "nutrition_per_100g": {
-            "calories": 22,
-            "protein": 3.1,
-            "carbs": 3.3,
-            "fat": 0.3,
-            "fiber": 1
-        }
-    },
-    "olives": {
-        "default_unit": "piece",
-        "portion_weights": {
-            "piece": 5
-        },
-        "nutrition_per_100g": {
-            "calories": 115,
-            "protein": 0.8,
-            "carbs": 6.3,
-            "fat": 10.7,
-            "fiber": 1.6
-        }
-    },
-    "avocado": {
-        "default_unit": "piece",
-        "portion_weights": {
-            "piece": 150
-        },
-        "nutrition_per_100g": {
-            "calories": 160,
-            "protein": 2,
-            "carbs": 9,
-            "fat": 15,
-            "fiber": 7
-        }
-    },
-    "honey": {
-        "default_unit": "tbsp",
-        "portion_weights": {
-            "tbsp": 21
-        },
-        "nutrition_per_100g": {
-            "calories": 304,
-            "protein": 0.3,
-            "carbs": 82,
-            "fat": 0,
-            "fiber": 0
-        }
-    },
-    "olive oil": {
-        "default_unit": "tbsp",
-        "portion_weights": {
-            "tbsp": 13.5
-        },
-        "nutrition_per_100g": {
-            "calories": 884,
-            "protein": 0,
-            "carbs": 0,
-            "fat": 100,
-            "fiber": 0
-        }
-    },
-    "butter": {
-        "default_unit": "tbsp",
-        "portion_weights": {
-            "tbsp": 14
-        },
-        "nutrition_per_100g": {
-            "calories": 717,
-            "protein": 0.9,
-            "carbs": 0.1,
-            "fat": 81.1,
-            "fiber": 0
-        }
-    },
-    "oatmeal": {
-        "default_unit": "cup",
-        "portion_weights": {
-            "cup": 81
-        },
-        "nutrition_per_100g": {
-            "calories": 379,
-            "protein": 13.2,
-            "carbs": 67.7,
-            "fat": 6.9,
-            "fiber": 10.6
-        }
-    },
-    "almonds": {
-        "default_unit": "oz",
-        "portion_weights": {
-            "oz": 28
-        },
-        "nutrition_per_100g": {
-            "calories": 579,
-            "protein": 21.1,
-            "carbs": 21.5,
-            "fat": 49.9,
-            "fiber": 12.5
-        }
-    },
-    "peanuts": {
-        "default_unit": "oz",
-        "portion_weights": {
-            "oz": 28
-        },
-        "nutrition_per_100g": {
-            "calories": 567,
-            "protein": 25.8,
-            "carbs": 16.1,
-            "fat": 49.2,
-            "fiber": 8.6
-        }
-    },
-    "peanut butter": {
-        "default_unit": "tbsp",
-        "portion_weights": {
-            "tbsp": 16
-        },
-        "nutrition_per_100g": {
-            "calories": 588,
-            "protein": 25.4,
-            "carbs": 20,
-            "fat": 50.4,
-            "fiber": 6
-        }
-    },
-    "cereal": {
-        "default_unit": "cup",
-        "portion_weights": {
-            "cup": 30
-        },
-        "nutrition_per_100g": {
-            "calories": 380,
-            "protein": 7,
-            "carbs": 85,
-            "fat": 2,
-            "fiber": 3
-        }
-    },
-    "granola": {
-        "default_unit": "cup",
-        "portion_weights": {
-            "cup": 30
-        },
-        "nutrition_per_100g": {
-            "calories": 471,
-            "protein": 11,
-            "carbs": 61,
-            "fat": 20,
-            "fiber": 7
-        }
-    },
-    "mixed vegetables": {
-        "default_unit": "cup",
-        "portion_weights": {
-            "cup": 150
-        },
-        "nutrition_per_100g": {
-            "calories": 35,
-            "protein": 2.5,
-            "carbs": 7,
-            "fat": 0.3,
-            "fiber": 2
-        }
-    },
-    "mixed salad": {
-        "default_unit": "cup",
-        "portion_weights": {
-            "cup": 50
-        },
-        "nutrition_per_100g": {
-            "calories": 25,
-            "protein": 1.5,
-            "carbs": 5,
-            "fat": 0.2,
-            "fiber": 1.5
-        }
-    },
-    "black beans": {
-        "default_unit": "cup",
-        "portion_weights": {
-            "cup": 172
-        },
-        "nutrition_per_100g": {
-            "calories": 132,
-            "protein": 8.9,
-            "carbs": 24,
-            "fat": 0.5,
-            "fiber": 6.4
-        }
-    },
-    "turkey": {
-        "default_unit": "oz",
-        "portion_weights": {
-            "oz": 28
-        },
-        "nutrition_per_100g": {
-            "calories": 135,
-            "protein": 30,
-            "carbs": 0,
-            "fat": 1,
-            "fiber": 0
-        }
-    },
-    "fish": {
-        "default_unit": "piece",
-        "portion_weights": {
-            "piece": 150
-        },
-        "nutrition_per_100g": {
-            "calories": 206,
-            "protein": 22,
-            "carbs": 0,
-            "fat": 13,
-            "fiber": 0
-        }
-    },
-    "coffee": {
-        "default_unit": "cup",
-        "portion_weights": {
-            "cup": 240
-        },
-        "nutrition_per_100g": {
-            "calories": 1,
-            "protein": 0.1,
-            "carbs": 0,
-            "fat": 0,
-            "fiber": 0
-        }
+    "nutrition_per_100g": {
+      "calories": 143,
+      "protein": 13,
+      "carbs": 1.1,
+      "fat": 10,
+      "fiber": 0
     }
+  },
+  "chicken breast": {
+    "default_unit": "piece",
+    "portion_weights": {
+      "piece": 150
+    },
+    "nutrition_per_100g": {
+      "calories": 165,
+      "protein": 31,
+      "carbs": 0,
+      "fat": 3.6,
+      "fiber": 0
+    }
+  },
+  "beef": {
+    "default_unit": "oz",
+    "portion_weights": {
+      "oz": 28
+    },
+    "nutrition_per_100g": {
+      "calories": 250,
+      "protein": 26,
+      "carbs": 0,
+      "fat": 15,
+      "fiber": 0
+    }
+  },
+  "salmon": {
+    "default_unit": "piece",
+    "portion_weights": {
+      "piece": 150
+    },
+    "nutrition_per_100g": {
+      "calories": 206,
+      "protein": 22,
+      "carbs": 0,
+      "fat": 13,
+      "fiber": 0
+    }
+  },
+  "tuna": {
+    "default_unit": "oz",
+    "portion_weights": {
+      "oz": 28
+    },
+    "nutrition_per_100g": {
+      "calories": 144,
+      "protein": 30,
+      "carbs": 0,
+      "fat": 1.3,
+      "fiber": 0
+    }
+  },
+  "rice": {
+    "default_unit": "cup",
+    "portion_weights": {
+      "cup": 185
+    },
+    "nutrition_per_100g": {
+      "calories": 130,
+      "protein": 2.7,
+      "carbs": 28,
+      "fat": 0.3,
+      "fiber": 0.4
+    }
+  },
+  "pasta": {
+    "default_unit": "cup",
+    "portion_weights": {
+      "cup": 140
+    },
+    "nutrition_per_100g": {
+      "calories": 157,
+      "protein": 5.8,
+      "carbs": 31,
+      "fat": 0.9,
+      "fiber": 1.8
+    }
+  },
+  "bread": {
+    "default_unit": "slice",
+    "portion_weights": {
+      "unit": 45,
+      "slice": 45
+    },
+    "nutrition_per_100g": {
+      "calories": 265,
+      "protein": 9,
+      "carbs": 49,
+      "fat": 3.2,
+      "fiber": 2.7
+    }
+  },
+  "milk": {
+    "default_unit": "cup",
+    "portion_weights": {
+      "cup": 244
+    },
+    "nutrition_per_100g": {
+      "calories": 61,
+      "protein": 3.2,
+      "carbs": 4.8,
+      "fat": 3.3,
+      "fiber": 0
+    }
+  },
+  "cheese": {
+    "default_unit": "oz",
+    "portion_weights": {
+      "oz": 28
+    },
+    "nutrition_per_100g": {
+      "calories": 402,
+      "protein": 7,
+      "carbs": 0.7,
+      "fat": 33,
+      "fiber": 0
+    }
+  },
+  "yogurt": {
+    "default_unit": "cup",
+    "portion_weights": {
+      "cup": 245
+    },
+    "nutrition_per_100g": {
+      "calories": 59,
+      "protein": 10,
+      "carbs": 3.3,
+      "fat": 0.4,
+      "fiber": 0
+    }
+  },
+  "banana": {
+    "default_unit": "piece",
+    "portion_weights": {
+      "piece": 118
+    },
+    "nutrition_per_100g": {
+      "calories": 89,
+      "protein": 1.1,
+      "carbs": 23,
+      "fat": 0.3,
+      "fiber": 2.6
+    }
+  },
+  "apple": {
+    "default_unit": "piece",
+    "portion_weights": {
+      "piece": 182
+    },
+    "nutrition_per_100g": {
+      "calories": 52,
+      "protein": 0.3,
+      "carbs": 14,
+      "fat": 0.2,
+      "fiber": 2.4
+    }
+  },
+  "potato": {
+    "default_unit": "piece",
+    "portion_weights": {
+      "piece": 173
+    },
+    "nutrition_per_100g": {
+      "calories": 77,
+      "protein": 2,
+      "carbs": 17,
+      "fat": 0.1,
+      "fiber": 2.2
+    }
+  },
+  "broccoli": {
+    "default_unit": "cup",
+    "portion_weights": {
+      "cup": 91
+    },
+    "nutrition_per_100g": {
+      "calories": 34,
+      "protein": 2.8,
+      "carbs": 7,
+      "fat": 0.4,
+      "fiber": 2.4
+    }
+  },
+  "carrots": {
+    "default_unit": "cup",
+    "portion_weights": {
+      "cup": 128
+    },
+    "nutrition_per_100g": {
+      "calories": 41,
+      "protein": 0.9,
+      "carbs": 10,
+      "fat": 0.2,
+      "fiber": 2.8
+    }
+  },
+  "mushrooms": {
+    "default_unit": "cup",
+    "portion_weights": {
+      "cup": 70
+    },
+    "nutrition_per_100g": {
+      "calories": 22,
+      "protein": 3.1,
+      "carbs": 3.3,
+      "fat": 0.3,
+      "fiber": 1
+    }
+  },
+  "olives": {
+    "default_unit": "piece",
+    "portion_weights": {
+      "piece": 5
+    },
+    "nutrition_per_100g": {
+      "calories": 115,
+      "protein": 0.8,
+      "carbs": 6.3,
+      "fat": 10.7,
+      "fiber": 1.6
+    }
+  },
+  "avocado": {
+    "default_unit": "piece",
+    "portion_weights": {
+      "piece": 150
+    },
+    "nutrition_per_100g": {
+      "calories": 160,
+      "protein": 2,
+      "carbs": 9,
+      "fat": 15,
+      "fiber": 7
+    }
+  },
+  "honey": {
+    "default_unit": "tbsp",
+    "portion_weights": {
+      "tbsp": 21
+    },
+    "nutrition_per_100g": {
+      "calories": 304,
+      "protein": 0.3,
+      "carbs": 82,
+      "fat": 0,
+      "fiber": 0
+    }
+  },
+  "olive oil": {
+    "default_unit": "tbsp",
+    "portion_weights": {
+      "tbsp": 13.5
+    },
+    "nutrition_per_100g": {
+      "calories": 884,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 100,
+      "fiber": 0
+    }
+  },
+  "butter": {
+    "default_unit": "tbsp",
+    "portion_weights": {
+      "tbsp": 14
+    },
+    "nutrition_per_100g": {
+      "calories": 717,
+      "protein": 0.9,
+      "carbs": 0.1,
+      "fat": 81.1,
+      "fiber": 0
+    }
+  },
+  "oatmeal": {
+    "default_unit": "cup",
+    "portion_weights": {
+      "cup": 81
+    },
+    "nutrition_per_100g": {
+      "calories": 379,
+      "protein": 13.2,
+      "carbs": 67.7,
+      "fat": 6.9,
+      "fiber": 10.6
+    }
+  },
+  "almonds": {
+    "default_unit": "oz",
+    "portion_weights": {
+      "oz": 28
+    },
+    "nutrition_per_100g": {
+      "calories": 579,
+      "protein": 21.1,
+      "carbs": 21.5,
+      "fat": 49.9,
+      "fiber": 12.5
+    }
+  },
+  "peanuts": {
+    "default_unit": "oz",
+    "portion_weights": {
+      "oz": 28
+    },
+    "nutrition_per_100g": {
+      "calories": 567,
+      "protein": 25.8,
+      "carbs": 16.1,
+      "fat": 49.2,
+      "fiber": 8.6
+    }
+  },
+  "peanut butter": {
+    "default_unit": "tbsp",
+    "portion_weights": {
+      "tbsp": 16
+    },
+    "nutrition_per_100g": {
+      "calories": 588,
+      "protein": 25.4,
+      "carbs": 20,
+      "fat": 50.4,
+      "fiber": 6
+    }
+  },
+  "cereal": {
+    "default_unit": "cup",
+    "portion_weights": {
+      "cup": 30
+    },
+    "nutrition_per_100g": {
+      "calories": 380,
+      "protein": 7,
+      "carbs": 85,
+      "fat": 2,
+      "fiber": 3
+    }
+  },
+  "granola": {
+    "default_unit": "cup",
+    "portion_weights": {
+      "cup": 30
+    },
+    "nutrition_per_100g": {
+      "calories": 471,
+      "protein": 11,
+      "carbs": 61,
+      "fat": 20,
+      "fiber": 7
+    }
+  },
+  "mixed vegetables": {
+    "default_unit": "cup",
+    "portion_weights": {
+      "cup": 150
+    },
+    "nutrition_per_100g": {
+      "calories": 35,
+      "protein": 2.5,
+      "carbs": 7,
+      "fat": 0.3,
+      "fiber": 2
+    }
+  },
+  "mixed salad": {
+    "default_unit": "cup",
+    "portion_weights": {
+      "cup": 50
+    },
+    "nutrition_per_100g": {
+      "calories": 25,
+      "protein": 1.5,
+      "carbs": 5,
+      "fat": 0.2,
+      "fiber": 1.5
+    }
+  },
+  "black beans": {
+    "default_unit": "cup",
+    "portion_weights": {
+      "cup": 172
+    },
+    "nutrition_per_100g": {
+      "calories": 132,
+      "protein": 8.9,
+      "carbs": 24,
+      "fat": 0.5,
+      "fiber": 6.4
+    }
+  },
+  "turkey": {
+    "default_unit": "oz",
+    "portion_weights": {
+      "oz": 28
+    },
+    "nutrition_per_100g": {
+      "calories": 135,
+      "protein": 30,
+      "carbs": 0,
+      "fat": 1,
+      "fiber": 0
+    }
+  },
+  "fish": {
+    "default_unit": "piece",
+    "portion_weights": {
+      "piece": 150
+    },
+    "nutrition_per_100g": {
+      "calories": 206,
+      "protein": 22,
+      "carbs": 0,
+      "fat": 13,
+      "fiber": 0
+    }
+  },
+  "coffee": {
+    "default_unit": "cup",
+    "portion_weights": {
+      "cup": 240
+    },
+    "nutrition_per_100g": {
+      "calories": 1,
+      "protein": 0.1,
+      "carbs": 0,
+      "fat": 0,
+      "fiber": 0
+    }
+  },
+  "egg white": {
+    "default_unit": "piece",
+    "portion_weights": {
+      "piece": 33,
+      "unit": 33
+    },
+    "nutrition_per_100g": {
+      "calories": 52,
+      "protein": 10.9,
+      "carbs": 0.7,
+      "fat": 0.2,
+      "fiber": 0
+    }
+  },
+  "pizza": {
+    "default_unit": "slice",
+    "portion_weights": {
+      "slice": 107,
+      "piece": 107,
+      "unit": 107
+    },
+    "nutrition_per_100g": {
+      "calories": 266,
+      "protein": 11,
+      "carbs": 33,
+      "fat": 10,
+      "fiber": 2.3
+    }
+  },
+  "burrito": {
+    "default_unit": "unit",
+    "portion_weights": {
+      "unit": 300,
+      "piece": 300
+    },
+    "nutrition_per_100g": {
+      "calories": 206,
+      "protein": 8,
+      "carbs": 28,
+      "fat": 7,
+      "fiber": 4
+    }
+  },
+  "tortilla": {
+    "default_unit": "piece",
+    "portion_weights": {
+      "piece": 49,
+      "unit": 49
+    },
+    "nutrition_per_100g": {
+      "calories": 297,
+      "protein": 8,
+      "carbs": 49,
+      "fat": 8,
+      "fiber": 3
+    }
+  },
+  "burger": {
+    "default_unit": "unit",
+    "portion_weights": {
+      "unit": 240,
+      "piece": 240
+    },
+    "nutrition_per_100g": {
+      "calories": 250,
+      "protein": 13,
+      "carbs": 24,
+      "fat": 12,
+      "fiber": 1.5
+    }
+  },
+  "guacamole": {
+    "default_unit": "tbsp",
+    "portion_weights": {
+      "tbsp": 15,
+      "cup": 230,
+      "unit": 30
+    },
+    "nutrition_per_100g": {
+      "calories": 160,
+      "protein": 2,
+      "carbs": 9,
+      "fat": 15,
+      "fiber": 6.7
+    }
+  },
+  "salsa": {
+    "default_unit": "tbsp",
+    "portion_weights": {
+      "tbsp": 16,
+      "cup": 260,
+      "unit": 30
+    },
+    "nutrition_per_100g": {
+      "calories": 36,
+      "protein": 1.5,
+      "carbs": 7,
+      "fat": 0.2,
+      "fiber": 1.5
+    }
+  },
+  "sour cream": {
+    "default_unit": "tbsp",
+    "portion_weights": {
+      "tbsp": 12,
+      "cup": 230,
+      "unit": 30
+    },
+    "nutrition_per_100g": {
+      "calories": 193,
+      "protein": 2.4,
+      "carbs": 4.6,
+      "fat": 19,
+      "fiber": 0
+    }
+  },
+  "fries": {
+    "default_unit": "serving",
+    "portion_weights": {
+      "serving": 117,
+      "unit": 117,
+      "cup": 96
+    },
+    "nutrition_per_100g": {
+      "calories": 312,
+      "protein": 3.4,
+      "carbs": 41,
+      "fat": 15,
+      "fiber": 3.8
+    }
+  },
+  "protein shake": {
+    "default_unit": "serving",
+    "portion_weights": {
+      "serving": 330,
+      "unit": 330,
+      "cup": 240
+    },
+    "nutrition_per_100g": {
+      "calories": 45,
+      "protein": 9,
+      "carbs": 3,
+      "fat": 0.8,
+      "fiber": 0.3
+    }
+  },
+  "soda": {
+    "default_unit": "can",
+    "portion_weights": {
+      "can": 355,
+      "cup": 240,
+      "bottle": 591,
+      "unit": 355
+    },
+    "nutrition_per_100g": {
+      "calories": 41,
+      "protein": 0,
+      "carbs": 10.6,
+      "fat": 0,
+      "fiber": 0
+    }
+  },
+  "lettuce": {
+    "default_unit": "cup",
+    "portion_weights": {
+      "cup": 36,
+      "unit": 36
+    },
+    "nutrition_per_100g": {
+      "calories": 15,
+      "protein": 1.4,
+      "carbs": 2.9,
+      "fat": 0.2,
+      "fiber": 1.3
+    }
+  },
+  "tiramisu": {
+    "default_unit": "slice",
+    "portion_weights": {
+      "slice": 120,
+      "piece": 120,
+      "serving": 120,
+      "unit": 120
+    },
+    "nutrition_per_100g": {
+      "calories": 283,
+      "protein": 4.5,
+      "carbs": 31,
+      "fat": 16,
+      "fiber": 1
+    }
+  },
+  "pad thai": {
+    "default_unit": "serving",
+    "portion_weights": {
+      "serving": 300,
+      "plate": 350,
+      "cup": 180,
+      "unit": 300
+    },
+    "nutrition_per_100g": {
+      "calories": 153,
+      "protein": 7,
+      "carbs": 20,
+      "fat": 5,
+      "fiber": 1.5
+    }
+  },
+  "cheesecake": {
+    "default_unit": "slice",
+    "portion_weights": {
+      "slice": 125,
+      "piece": 125,
+      "serving": 125,
+      "unit": 125
+    },
+    "nutrition_per_100g": {
+      "calories": 321,
+      "protein": 5.5,
+      "carbs": 25,
+      "fat": 23,
+      "fiber": 0.4
+    }
+  },
+  "cake": {
+    "default_unit": "slice",
+    "portion_weights": {
+      "slice": 100,
+      "piece": 100,
+      "serving": 100,
+      "unit": 100
+    },
+    "nutrition_per_100g": {
+      "calories": 350,
+      "protein": 4,
+      "carbs": 50,
+      "fat": 15,
+      "fiber": 1
+    }
+  },
+  "apple pie": {
+    "default_unit": "slice",
+    "portion_weights": {
+      "slice": 125,
+      "piece": 125,
+      "serving": 125,
+      "unit": 125
+    },
+    "nutrition_per_100g": {
+      "calories": 237,
+      "protein": 2,
+      "carbs": 34,
+      "fat": 11,
+      "fiber": 1.6
+    }
+  },
+  "pancakes": {
+    "default_unit": "piece",
+    "portion_weights": {
+      "piece": 40,
+      "unit": 40,
+      "serving": 80
+    },
+    "nutrition_per_100g": {
+      "calories": 227,
+      "protein": 6.4,
+      "carbs": 28,
+      "fat": 10,
+      "fiber": 1.3
+    }
+  },
+  "waffles": {
+    "default_unit": "piece",
+    "portion_weights": {
+      "piece": 70,
+      "unit": 70,
+      "serving": 140
+    },
+    "nutrition_per_100g": {
+      "calories": 291,
+      "protein": 7.9,
+      "carbs": 33,
+      "fat": 14,
+      "fiber": 1.8
+    }
+  },
+  "ramen": {
+    "default_unit": "bowl",
+    "portion_weights": {
+      "bowl": 550,
+      "serving": 550,
+      "unit": 550,
+      "cup": 240
+    },
+    "nutrition_per_100g": {
+      "calories": 85,
+      "protein": 4,
+      "carbs": 11,
+      "fat": 3,
+      "fiber": 0.8
+    }
+  },
+  "pho": {
+    "default_unit": "bowl",
+    "portion_weights": {
+      "bowl": 650,
+      "serving": 650,
+      "unit": 650,
+      "cup": 240
+    },
+    "nutrition_per_100g": {
+      "calories": 65,
+      "protein": 5,
+      "carbs": 9,
+      "fat": 1.5,
+      "fiber": 0.5
+    }
+  },
+  "sushi": {
+    "default_unit": "serving",
+    "portion_weights": {
+      "serving": 180,
+      "piece": 30,
+      "unit": 180
+    },
+    "nutrition_per_100g": {
+      "calories": 145,
+      "protein": 6,
+      "carbs": 28,
+      "fat": 1,
+      "fiber": 0.8
+    }
+  },
+  "tacos": {
+    "default_unit": "unit",
+    "portion_weights": {
+      "unit": 100,
+      "piece": 100,
+      "serving": 200
+    },
+    "nutrition_per_100g": {
+      "calories": 226,
+      "protein": 10,
+      "carbs": 21,
+      "fat": 11,
+      "fiber": 3
+    }
+  },
+  "hot dog": {
+    "default_unit": "unit",
+    "portion_weights": {
+      "unit": 150,
+      "piece": 150,
+      "serving": 150
+    },
+    "nutrition_per_100g": {
+      "calories": 290,
+      "protein": 10,
+      "carbs": 19,
+      "fat": 19,
+      "fiber": 1
+    }
+  },
+  "chicken wings": {
+    "default_unit": "serving",
+    "portion_weights": {
+      "serving": 150,
+      "piece": 35,
+      "unit": 35
+    },
+    "nutrition_per_100g": {
+      "calories": 290,
+      "protein": 24,
+      "carbs": 0,
+      "fat": 20,
+      "fiber": 0
+    }
+  },
+  "ice cream": {
+    "default_unit": "cup",
+    "portion_weights": {
+      "cup": 132,
+      "serving": 66,
+      "unit": 132
+    },
+    "nutrition_per_100g": {
+      "calories": 207,
+      "protein": 3.5,
+      "carbs": 24,
+      "fat": 11,
+      "fiber": 0.7
+    }
+  },
+  "donut": {
+    "default_unit": "unit",
+    "portion_weights": {
+      "unit": 60,
+      "piece": 60,
+      "serving": 60
+    },
+    "nutrition_per_100g": {
+      "calories": 417,
+      "protein": 5,
+      "carbs": 57,
+      "fat": 19,
+      "fiber": 2
+    }
+  },
+  "dumplings": {
+    "default_unit": "serving",
+    "portion_weights": {
+      "serving": 150,
+      "piece": 35,
+      "unit": 35
+    },
+    "nutrition_per_100g": {
+      "calories": 180,
+      "protein": 8,
+      "carbs": 25,
+      "fat": 5,
+      "fiber": 1.5
+    }
+  },
+  "nachos": {
+    "default_unit": "serving",
+    "portion_weights": {
+      "serving": 220,
+      "plate": 300,
+      "unit": 220
+    },
+    "nutrition_per_100g": {
+      "calories": 306,
+      "protein": 8,
+      "carbs": 32,
+      "fat": 16,
+      "fiber": 4
+    }
+  }
 }

@@ -8,6 +8,7 @@ import json
 from typing import Dict, Optional, List, Tuple
 from dataclasses import dataclass
 from dotenv import load_dotenv
+from nutrition_cache import NutritionCache
 
 load_dotenv()
 
@@ -152,100 +153,198 @@ class NutritionService:
     ) -> Tuple[Optional[NutritionData], str, str]:
         """
         Fetch nutrition data for an ingredient.
-        Returns (nutrition, confidence, warning)
+
+        Ideal pipeline:
+        1. Use curated core_foods.json when available.
+        2. Use saved USDA cache when this food was previously looked up.
+        3. Query USDA FoodData Central for new foods.
+        4. Cache successful USDA lookups for next time.
+        5. Fall back to the older local dictionary if API data is unavailable.
+
+        Returns (nutrition, confidence, warning).
         """
-        # Normalize quantity to grams for calculations (simplified)
+        normalized_name = NutritionService._normalize_food_name(ingredient_name)
+
+        # Normalize quantity to grams for calculations.
         quantity_grams = NutritionService._convert_to_grams(
-            quantity, unit, ingredient_name
+            quantity, unit, normalized_name
         )
 
-        # Try local curated dataset first
-        if ingredient_name in CORE_FOODS:
-            food_data = CORE_FOODS[ingredient_name]
+        # 1. Try the curated local food table first.
+        core_entry = NutritionService._get_core_food_entry(normalized_name)
+        if core_entry:
+            food_key, food_data = core_entry
             portion_weights = food_data["portion_weights"]
             default_unit = food_data["default_unit"]
             if unit in portion_weights:
                 grams = quantity * portion_weights[unit]
             else:
                 grams = quantity * portion_weights.get(default_unit, 100)
-            nutrition_per_100g = food_data["nutrition_per_100g"]
-            scale = grams / 100
-            nutrition = NutritionData(
-                calories=nutrition_per_100g["calories"] * scale,
-                protein=nutrition_per_100g["protein"] * scale,
-                carbs=nutrition_per_100g["carbs"] * scale,
-                fat=nutrition_per_100g["fat"] * scale,
-                fiber=nutrition_per_100g.get("fiber", 0) * scale,
+            nutrition = NutritionService._nutrition_from_per_100g(
+                food_data["nutrition_per_100g"], grams
             )
-            return nutrition, "high", ""
+            return nutrition, "high", f"Used local nutrition estimate for {food_key}."
 
-        # Try USDA API
-        nutrition = NutritionService._fetch_from_usda(ingredient_name)
+        # 2. Try cached USDA results before making a network request.
+        cached = NutritionCache.get(normalized_name)
+        if cached:
+            nutrition = NutritionService._nutrition_from_per_100g(
+                cached.get("nutrition_per_100g", {}), quantity_grams
+            )
+            return nutrition, "medium", "Used cached USDA nutrition data."
+
+        # 3. Try USDA API for foods missing from the local table/cache.
+        usda_result = NutritionService._fetch_from_usda(normalized_name)
+        if usda_result:
+            nutrition, metadata = usda_result
+            NutritionCache.set(
+                normalized_name,
+                NutritionService._nutrition_to_dict(nutrition),
+                source="USDA FoodData Central",
+                source_food_id=metadata.get("fdc_id"),
+                source_description=metadata.get("description", ""),
+            )
+            scaled = NutritionService._scale_nutrition(nutrition, quantity_grams)
+            return scaled, "medium", "Used USDA FoodData Central and cached this food for future scans."
+
+        # 4. Last local fallback for common ingredients.
+        nutrition = NutritionService._fetch_from_local_db(normalized_name)
         if nutrition:
             scaled = NutritionService._scale_nutrition(nutrition, quantity_grams)
-            return scaled, "medium", ""
+            return scaled, "low", "Estimated using generic serving assumptions."
 
-        # Fallback to local database
-        nutrition = NutritionService._fetch_from_local_db(ingredient_name)
-        if nutrition:
-            scaled = NutritionService._scale_nutrition(nutrition, quantity_grams)
-            return scaled, "low", "Estimated using generic serving assumptions"
-
-        return None, "low", "No nutrition data found"
+        return None, "low", "No nutrition data found. Try editing the meal description or adding this food to core_foods.json."
 
     @staticmethod
     def _convert_to_grams(quantity: float, unit: str, ingredient_name: str) -> float:
         """
         Convert quantity + unit to approximate grams.
-        Simplified conversion for MVP.
+
+        Curated foods use their own portion weights first. This generic converter
+        is mainly for USDA/cache/local fallback values that are stored per 100g.
         """
         conversions = {
-            "cup": 240,  # 1 cup ≈ 240g
-            "tbsp": 15,  # 1 tbsp ≈ 15g
-            "tsp": 5,  # 1 tsp ≈ 5g
-            "oz": 28,  # 1 oz ≈ 28g
-            "g": 1,  # grams
-            "lb": 454,  # 1 lb ≈ 454g
-            "l": 1000,  # 1 liter ≈ 1000g
-            "ml": 1,  # 1 ml ≈ 1g (for water)
-            "slice": 25,  # 1 slice of bread ≈ 25g
-            "piece": 100,  # generic piece ≈ 100g
-            "unit": 100,  # generic unit ≈ 100g
+            "cup": 240,
+            "tbsp": 15,
+            "tsp": 5,
+            "oz": 28,
+            "g": 1,
+            "lb": 454,
+            "l": 1000,
+            "ml": 1,
+            "slice": 100,
+            "piece": 100,
+            "serving": 150,
+            "bowl": 400,
+            "plate": 350,
+            "can": 355,
+            "bottle": 591,
+            "item": 100,
+            "whole": 100,
+            "unit": 100,
         }
         grams_per_unit = conversions.get(unit, 100)
         return quantity * grams_per_unit
 
     @staticmethod
-    def _fetch_from_usda(ingredient_name: str) -> Optional[NutritionData]:
-        """Fetch nutrition from USDA API."""
+    def _normalize_food_name(food_name: str) -> str:
+        """Normalize ingredient names before cache/API lookup."""
+        normalized = NutritionCache.normalize_key(food_name)
+        # Tiny singularization helper for simple plurals not handled by meal_parser.
+        if normalized not in CORE_FOODS and normalized.endswith("s"):
+            singular = normalized[:-1]
+            if singular in CORE_FOODS:
+                return singular
+        return normalized
+
+    @staticmethod
+    def _get_core_food_entry(food_name: str) -> Optional[Tuple[str, dict]]:
+        """Return a matching core food entry using exact and simple singular matching."""
+        if food_name in CORE_FOODS:
+            return food_name, CORE_FOODS[food_name]
+        if food_name.endswith("s") and food_name[:-1] in CORE_FOODS:
+            key = food_name[:-1]
+            return key, CORE_FOODS[key]
+        return None
+
+    @staticmethod
+    def _nutrition_from_per_100g(nutrition_per_100g: dict, grams: float) -> NutritionData:
+        scale = grams / 100
+        return NutritionData(
+            calories=float(nutrition_per_100g.get("calories", 0) or 0) * scale,
+            protein=float(nutrition_per_100g.get("protein", 0) or 0) * scale,
+            carbs=float(nutrition_per_100g.get("carbs", 0) or 0) * scale,
+            fat=float(nutrition_per_100g.get("fat", 0) or 0) * scale,
+            fiber=float(nutrition_per_100g.get("fiber", 0) or 0) * scale,
+        )
+
+    @staticmethod
+    def _nutrition_to_dict(nutrition: NutritionData) -> dict:
+        return {
+            "calories": nutrition.calories,
+            "protein": nutrition.protein,
+            "carbs": nutrition.carbs,
+            "fat": nutrition.fat,
+            "fiber": nutrition.fiber,
+        }
+
+    @staticmethod
+    def _fetch_from_usda(ingredient_name: str) -> Optional[Tuple[NutritionData, dict]]:
+        """Fetch per-100g nutrition from USDA FoodData Central API."""
         try:
             params = {
                 "query": ingredient_name,
                 "pageSize": 1,
                 "api_key": USDA_API_KEY,
             }
-            response = requests.get(USDA_API_URL, params=params, timeout=5)
+            response = requests.get(USDA_API_URL, params=params, timeout=8)
             response.raise_for_status()
 
             data = response.json()
-            if data.get("foods"):
-                food = data["foods"][0]
-                nutrients = {
-                    n["nutrientName"]: n.get("value", 0)
-                    for n in food.get("foodNutrients", [])
-                }
+            foods = data.get("foods") or []
+            if not foods:
+                return None
 
-                return NutritionData(
-                    calories=nutrients.get("Energy", 0),
-                    protein=nutrients.get("Protein", 0),
-                    carbs=nutrients.get("Carbohydrate, by difference", 0),
-                    fat=nutrients.get("Total lipid (fat)", 0),
-                    fiber=nutrients.get("Fiber, total dietary", 0),
-                )
+            food = foods[0]
+            nutrients = NutritionService._extract_usda_nutrients(food)
+            metadata = {
+                "fdc_id": food.get("fdcId"),
+                "description": food.get("description", ""),
+            }
+            return nutrients, metadata
         except Exception as e:
             print(f"USDA API error for '{ingredient_name}': {e}")
 
         return None
+
+    @staticmethod
+    def _extract_usda_nutrients(food: dict) -> NutritionData:
+        """Extract calories/macros from USDA response in a more tolerant way."""
+        result = {"calories": 0.0, "protein": 0.0, "carbs": 0.0, "fat": 0.0, "fiber": 0.0}
+
+        for nutrient in food.get("foodNutrients", []):
+            name = str(nutrient.get("nutrientName", "")).lower()
+            number = str(nutrient.get("nutrientNumber", ""))
+            unit_name = str(nutrient.get("unitName", "")).upper()
+            value = nutrient.get("value", nutrient.get("amount", 0)) or 0
+
+            try:
+                value = float(value)
+            except (TypeError, ValueError):
+                value = 0.0
+
+            if (number == "1008" or name == "energy") and unit_name in {"KCAL", "CAL", ""}:
+                result["calories"] = value
+            elif number == "1003" or name == "protein":
+                result["protein"] = value
+            elif number == "1005" or "carbohydrate" in name:
+                result["carbs"] = value
+            elif number == "1004" or "total lipid" in name or name == "fat":
+                result["fat"] = value
+            elif number == "1079" or "fiber" in name:
+                result["fiber"] = value
+
+        return NutritionData(**result)
 
     @staticmethod
     def _fetch_from_local_db(ingredient_name: str) -> Optional[NutritionData]:
