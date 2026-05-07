@@ -14,6 +14,7 @@ from typing import List, Optional
 
 import requests
 from dotenv import load_dotenv
+from huggingface_hub import InferenceClient
 
 load_dotenv()
 
@@ -228,28 +229,32 @@ class FoodVisionService:
             return None
 
         try:
-            response = requests.post(
-                HF_API_URL,
-                headers={
-                    "Authorization": f"Bearer {HF_API_TOKEN}",
-                    "Content-Type": content_type or "application/octet-stream",
-                },
-                data=image_bytes,
-                timeout=20,
+            client = InferenceClient(
+                provider="hf-inference",
+                api_key=HF_API_TOKEN,
             )
-            response.raise_for_status()
-            payload = response.json()
 
-            if isinstance(payload, dict) and "error" in payload:
-                print(f"Food vision API error: {payload['error']}")
-                return None
+            payload = client.image_classification(
+                image=image_bytes,
+                model=HF_FOOD_MODEL,
+                top_k=5,
+            )
 
             predictions = []
-            if isinstance(payload, list):
-                for item in payload[:5]:
-                    label = str(item.get("label", "unknown food"))
-                    score = float(item.get("score", 0.0))
-                    predictions.append(FoodPrediction(label=label, score=score))
+            for item in payload[:5]:
+                label = getattr(item, "label", None)
+                score = getattr(item, "score", None)
+
+                if isinstance(item, dict):
+                    label = item.get("label", label)
+                    score = item.get("score", score)
+
+                predictions.append(
+                    FoodPrediction(
+                        label=str(label or "unknown food"),
+                        score=float(score or 0.0),
+                    )
+                )
 
             if not predictions:
                 return None
@@ -263,6 +268,7 @@ class FoodVisionService:
                 warning="",
                 top_predictions=predictions,
             )
+
         except Exception as exc:
             print(f"Food vision API request failed: {exc}")
             return None
